@@ -1,0 +1,31 @@
+<template>
+
+  <template repeat.for="stat of stats">
+    <div class="param-row">
+      <fast-checkbox checked.bind="stat.selected" change.trigger="computeTotalSelected() & debounce:50"></fast-checkbox>
+      <label>${stat.originalFile}</label>
+      <fast-badge fill="primary" color="primary">${stat.count}</fast-badge>
+    </div>
+    <div class="param-info">
+      ${stat.date} / ${stat.id}
+    </div>
+  </template>
+
+  <div class="param-row">
+    <fast-checkbox checked.bind="totalSelected"></fast-checkbox>
+    <label>Total</label>
+    <fast-badge fill="primary" color="primary">${total}</fast-badge>
+  </div>
+
+  <fast-menu style="margin-top: 16px;">
+    <fast-menu-item disabled.bind="!somethingSelected" click.trigger="deleteSelectedObjects()">
+      <fast-icon icon="Trash" slot="start"></fast-icon>
+      Delete selected objects
+    </fast-menu-item>
+    <fast-menu-item disabled.bind="!somethingSelected" click.trigger="exportSelectedObjects()">
+      <fast-icon icon="Download" slot="start"></fast-icon>
+      Export selected objects
+    </fast-menu-item>
+  </fast-menu>
+
+</template>

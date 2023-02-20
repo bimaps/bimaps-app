@@ -1,0 +1,125 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./signage-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Flag"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-signage-panel ${isFullScreen ? 'tool-panel-fullscreen' : ''}" hidden>
+
+    <template if.bind="!selectedSignage">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="toggleOpened()" hover-fill icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        Signages
+        <fast-button appearance="lightweight" hover-fill icon click.trigger="startListeningCursor('create')" if.bind="rights.canWriteSignages && listenToCursor !== 'create'" disabled.bind="!siteNavigator.selectedLevelName">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+        <fast-button appearance="lightweight" hover-fill icon click.trigger="stopListeningCursor('select')" if.bind="listenToCursor === 'create'">
+          Cancel
+        </fast-button>
+      </div>
+      <p>Click on a signage on the screen to edit it</p>
+    </template>
+
+    <template if.bind="selectedSignage">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="unselectSignage()" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <span class="text-hint">Edit Signage</span>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="enableFullScreen()" if.bind="!isFullScreen">
+          <fast-icon icon="ArrowsExpand"></fast-icon>
+        </fast-button>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="disableFullScreen()" if.bind="isFullScreen">
+          <fast-icon icon="ArrowsCondense"></fast-icon>
+        </fast-button>
+      </div>
+
+      <form>
+        <div class="tool-panel-content-under-header">
+
+
+          <fast-accordion>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Main settings</div>
+
+              <div class="param-row">
+                <label>Position</label>
+                <fast-button appearance="outline" click.trigger="editSignagePosition()">${selectedSignage.position.x | round:2}, ${selectedSignage.position.y | round:2}, ${selectedSignage.position.z | round:2}</fast-button>
+              </div>
+              <div class="param-row">
+                <label>Layout</label>
+                <fast-button appearance="outline" click.trigger="editLayout()">
+                  ${layoutName(selectedSignage.layout)}
+                </fast-button>
+              </div>
+              <div class="param-row">
+                <label>Scale</label>
+                <fast-text-field type="number" min="0.5" max="1" step="0.1" value.bind="selectedSignage.fontScale" change.trigger="signageHasChanged = true"></fast-text-field>
+              </div>
+
+            </fast-accordion-item>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Items</div>
+              <div class="param-section">
+                <div
+                  class="param-row signage-item"
+                  reorderable-repeat.for="item of selectedSignage.items"
+                  reorderable-dnd-handler-selector=".handler"
+                  reorderable-after-reordering="itemsOrderChanged">
+                  <fast-icon icon="MenuAlt4" style="transform: scale(1, 0.8); cursor: pointer;" class="handler"></fast-icon>
+                  <label class="button-text-button">
+                    <span>
+                      <!-- <fast-icon icon.bind="item.iconLeft"></fast-icon> -->
+                      <img src.bind="getIconUrl(item.iconLeft)" if.bind="item.iconLeft" />
+                    </span>
+                    ${item.label}
+                    <span>
+                      <img src.bind="getIconUrl(item.iconRight)" if.bind="item.iconRight" />
+                    </span>
+                  </label>
+                  <fast-button appearance="lightweight" hover-fill icon click.trigger="editSignageItem(item)">
+                    <fast-icon icon="Pencil"></fast-icon>
+                  </fast-button>
+                </div>
+              </div>
+              <fast-button appearance="lightweight" click.trigger="addSignageItem()">Add item</fast-button>
+            </fast-accordion-item>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Objects on same level</div>
+              <fast-menu style="max-height: 400px; overflow-y: auto;">
+                <fast-menu-item repeat.for="object of objectsOnSameLevel(selectedSignage)">
+                  ${object}
+                  <fast-button slot="end" appearance="lightweight" hover-fill icon click.trigger="addItem(object)">
+                    <fast-icon icon="Plus"></fast-icon>
+                  </fast-button>
+                </fast-menu-item>
+              </fast-menu>
+            </fast-accordion-item>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Actions</div>
+              <fast-menu>
+                <fast-menu-item if.bind="!movingSignage" click.trigger="moveSignage()">Move Signage</fast-menu-item>
+                <fast-menu-item if.bind="movingSignage" style="white-space: normal;">
+                  <small>Click on the map to select the new location</small>
+                  <fast-button slot="end" appearance="lightweight" hover-fill click.trigger="cancelMovingSignage()">Cancel</fast-button>
+                </fast-menu-item>
+                <fast-menu-item click.trigger="downloadPDF()">Download PDF</fast-menu-item>
+              </fast-menu>
+            </fast-accordion-item>
+          </fast-accordion>
+          
+        </div>
+        <div class="button-text-button" style="margin-top: 8px;">
+          <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteSignage()" disabled.bind="!selectedSignage.id">Delete</fast-button>
+          <p></p>
+          <fast-button appearance="accent" click.trigger="saveSignage()" disabled.bind="!signageHasChanged && selectedSignage.id">Save</fast-button>
+        </div>
+      </form>
+    </template>
+
+  </fast-card>
+
+</template>

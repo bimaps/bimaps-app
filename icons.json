@@ -1,0 +1,4 @@
+{
+  "presets": ["aurelia-swissdata", "aurelia-three"],
+  "font-awesome": [{"key": "user", "value": "fa-person"}]
+}

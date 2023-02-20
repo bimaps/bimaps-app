@@ -1,0 +1,16 @@
+<template>
+  <fast-menu-item click.trigger="clickItem()">
+    <span if.bind="object.children.length && isOpened" slot="start" click.trigger="toggle($event)">
+      <fast-icon icon="FolderOpen" size="sm"></fast-icon>
+    </span>
+    <span if.bind="object.children.length && hasStructureTypeChildren(object.children) && !isOpened" slot="start" click.trigger="toggle($event)">
+      <fast-icon icon="Folder" size="sm"></fast-icon>
+    </span>
+    ${object.userData.properties.name || object.userData.properties.type || 'unknown'}
+  </fast-menu-item>
+  <fast-menu if.bind="hasStructureTypeChildren(object.children) && isOpened" class="children-objects">
+    <template repeat.for="child of object.children">
+      <spatial-structure-object object.bind="child" if.bind="isObjectStructureType(child)"></spatial-structure-object>
+    </template>
+  </fast-menu>
+</template>

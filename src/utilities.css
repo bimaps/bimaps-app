@@ -1,0 +1,21 @@
+.text-button {
+  display: grid;
+  grid-gap: var(--responsive-spacing-unit-lg);
+  grid-template-columns: 1fr min-content;
+  align-items: center;
+}
+.button-text {
+  display: grid;
+  grid-gap: var(--responsive-spacing-unit-lg);
+  grid-template-columns: min-content 1fr;
+  align-items: center;
+}
+.button-text-button {
+  display: grid;
+  grid-gap: var(--responsive-spacing-unit-lg);
+  grid-template-columns: min-content 1fr min-content;
+  align-items: center;
+}
+.text-hint {
+  color: var(--neutral-foreground-hint);
+}

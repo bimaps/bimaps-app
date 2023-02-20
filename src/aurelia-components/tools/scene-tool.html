@@ -1,0 +1,55 @@
+<template>
+  <require from="./tools.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="CubeTransparent"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel" hidden>
+    <template if.bind="!importing">
+      <p>
+        <fast-button appearance="neutral" click.trigger="clearScene()">Clear</fast-button>
+        <fast-button appearance="neutral" click.trigger="exportScene()">Export</fast-button>
+      </p>
+  
+      <p>
+        <fast-button appearance="accent" click.trigger="importFile()" disabled.bind="processing">Import file</fast-button>
+      </p>
+
+    </template>
+    <template if.bind="importing">
+
+      <div class="tool-panel-title">
+        Importing: <span class="text-hint">${importingFile.name}</span>
+      </div>
+
+      <div class="tool-sub-panel" if.bind="ifcModels.length > 0">
+        <div class="tool-sub-panel-title">Extract IFC objects</div>
+        <p if.bind="!siteManager" class="text-hint">You need to select a site before to extract objects</p>
+        <p>
+          <fast-checkbox checked.bind="includePsets">Include Psets data in extraction (slower)</fast-checkbox>
+        </p>
+        <p>
+          <fast-checkbox checked.bind="includeSiteObjects" disabled.bind="!hasSiteObjects">Include site objects</fast-checkbox>
+        </p>
+        <p>
+          <fast-checkbox checked.bind="flatten" disabled.bind="!hasSiteObjects">Flatten objects in site</fast-checkbox>
+        </p>
+        <p>
+          Context
+          <fast-select value.bind="context">
+            <fast-option value="gis">GIS</fast-option>
+            <fast-option value="bim">BIM</fast-option>
+          </fast-select>
+        </p>
+        <p>
+          <fast-button appearance="accent" click.trigger="decompose()" disabled.bind="processing || !siteManager">Extract IFC Models</fast-button>
+        </p>
+      </div>
+
+      <fast-button click.trigger="importing = false">Finish import</fast-button>
+
+    </template>
+  </fast-card>
+  
+
+</template>

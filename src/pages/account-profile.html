@@ -1,0 +1,28 @@
+<template>
+  <fast-stack large style="max-width: 500px; margin: auto;">
+            
+    <fast-breadcrumb>
+      <fast-breadcrumb-item>
+        <fast-anchor appearance="lightweight" click.trigger="global.navigateToRoute('account')" t="profile.My Account"></fast-anchor>
+      </fast-breadcrumb-item>
+      <fast-breadcrumb-item t="profile.My Profile"></fast-breadcrumb-item>
+    </fast-breadcrumb>
+    
+    <h2 t="profile.My Profile"></h2>
+
+    <fast-form>
+      <fast-form-row>
+        <label t="Firstname"></label>
+        <fast-text-field value.bind="editingUserInstance.firstname" input.trigger="userHasChanged = true"></fast-text-field>
+      </fast-form-row>
+      <fast-form-row>
+        <label t="Lastname"></label>
+        <fast-text-field value.bind="editingUserInstance.lastname" input.trigger="userHasChanged = true"></fast-text-field>
+      </fast-form-row>
+      <p>
+        <fast-button appearance="accent" disabled.bind="!userHasChanged" t="Save" click.trigger="updateProfile()"></fast-button>
+      </p>
+
+    </fast-form>
+  </fast-stack>
+</template>

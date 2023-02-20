@@ -1,0 +1,86 @@
+<template>
+  <require from="./import-from-file.css"></require>
+  <template if.bind="status === 'select-files'">
+    <fast-button appearance="lightweight" click.trigger="selectFilesToImport()">Select files to import</fast-button>
+
+    <div class="param-section" repeat.for="file of filesToImport">
+      <p class="param-section-head">
+        <span style="overflow: hidden;">${file.name}</span>
+        <fast-button appearance="lightweight" icon hover-fill if.bind="!file.ui.importing && !file.ui.imported" click.trigger="file.ui.showDetail = !file.ui.showDetail">
+          <fast-icon icon="${file.ui.showDetail ? 'ChevronUp':'ChevronDown'}"></fast-icon>
+        </fast-button>
+      </p>
+      <div class="param-info" if.bind="!file.ui.showDetail || file.ui.importing || file.ui.imported" style="margin-left: 0; padding: 4px 0;">
+        <fast-badge fill="primary" color="primary">${file.settings.context}</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.includePsets">Include Psets</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.includeSiteObjects">Include Site Object</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.ignoreBuildings">Ignore building</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.flatten">Flatten</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.translate">${file.settings.translation.x}, ${file.settings.translation.y}, ${file.settings.translation.z}</fast-badge>
+        <fast-badge fill="primary" color="primary" if.bind="file.settings.rotate">${file.settings.rotation.x}, ${file.settings.rotation.y}, ${file.settings.rotation.z}</fast-badge>
+        <fast-badge fill="secondary" color="secondary" if.bind="file.ui.importing">Importing...</fast-badge>
+        <fast-badge fill="secondary" color="secondary" if.bind="file.ui.imported">Imported</fast-badge>
+      </div>
+      <template if.bind="file.ui.showDetail">
+        <div class="param-row">
+          <span></span>
+          <label>Context</label>
+          <fast-button appearance="outline" click.trigger="switchFileContext(file)">${file.settings.context}</fast-button>
+        </div>
+        <div class="param-row">
+          <span></span>
+          <label>Include PSets</label>
+          <fast-switch checked.bind="file.settings.includePsets"></fast-switch>
+        </div>
+        <div class="param-row">
+          <span></span>
+          <label>Include Site Objects</label>
+          <fast-switch checked.bind="file.settings.includeSiteObjects"></fast-switch>
+        </div>
+        <div class="param-row">
+          <span></span>
+          <label>Ignore buildings</label>
+          <fast-switch checked.bind="file.settings.ignoreBuildings"></fast-switch>
+        </div>
+        <div class="param-row">
+          <span></span>
+          <label>Flatten</label>
+          <fast-switch checked.bind="file.settings.flatten"></fast-switch>
+        </div>
+        <div class="param-row">
+          <fast-checkbox checked.bind="file.settings.translate"></fast-checkbox>
+          <label>Translate</label>
+          <fast-button appearance="outline" click.trigger="editFileTranslation(file)">${file.settings.translation.x}, ${file.settings.translation.y}, ${file.settings.translation.z}</fast-button>
+        </div>
+        <div class="param-row">
+          <fast-checkbox checked.bind="file.settings.rotate"></fast-checkbox>
+          <label>Rotation</label>
+          <fast-button appearance="outline" click.trigger="editFileRotation(file)">${file.settings.rotation.x}, ${file.settings.rotation.y}, ${file.settings.rotation.z}</fast-button>
+        </div>
+        <fast-button appearance="lightweight" click.trigger="removeFromImportList(file)">Remove from import list</fast-button>
+      </template>
+    </div>
+    <fast-button click.trigger="importFiles()" if.bind="filesToImport.length">Import files</fast-button>
+  </template>
+
+  <template if.bind="status === 'files-imported'">
+    <fast-menu>
+      <fast-menu-item repeat.for="building of importedBuildings">
+        ${building.userData.properties.name || 'Building'}
+        <div if.bind="adjusting === undefined" slot="end">
+          <fast-button appearance="lightweight" hover-fill click.trigger="adjustBuildingPosRot(building, 'translate', $event)">TRANS</fast-button>
+          <fast-button appearance="lightweight" hover-fill click.trigger="adjustBuildingPosRot(building, 'rotate', $event)">ROT</fast-button>
+        </div>
+        <div if.bind="adjusting !== undefined && adjusting === building.userData.properties.name" slot="end">
+          <fast-button appearance="lightweight" hover-fill click.trigger="stopAdjusting(building, $event)">OK</fast-button>
+        </div>
+      </fast-menu-item>
+    </fast-menu>
+    <p>Don't forget to upload your imports if you want to keep them in the database.</p>
+    <div class="button-text-button">
+      <fast-button appearance="lightweight" click.trigger="startNewImport()">Start new import</fast-button>
+      <span></span>
+      <fast-button click.trigger="upload()">Upload</fast-button>
+    </div>
+  </template>
+</template>

@@ -1,0 +1,97 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./filter-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Filter"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-filter-panel" hidden>
+    <template if.bind="!selectedRule">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="toggleOpened()" hover-icon icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <span class="text-hint">Filtering rules</span>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="createNewRule()">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+      </div>
+
+      <div class="tool-panel-content-under-header">
+        <fast-menu>
+          <fast-menu-item repeat.for="rule of filteringRules" click.trigger="editRule(rule)">
+            <fast-checkbox checked.bind="rule.active" slot="start" click.trigger="toggleRuleActive(rule, $event)"></fast-checkbox>
+            ${rule.name}
+            <fast-icon icon="ChevronRight" slot="end"></fast-icon>
+          </fast-menu-item>
+        </fast-menu>
+        <fast-button appearance="lightweight" click.trigger="resetFilters()">Reset filters</fast-button>
+      </div>
+    </template>
+    <template if.bind="selectedRule">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="unselectRule()" hover-icon icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <span class="text-hint">${selectedRule.name}</span>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="deleteSelectedRule()">
+          <fast-icon icon="Trash"></fast-icon>
+        </fast-button>
+      </div>
+
+      <div class="tool-panel-content-under-header">
+
+        <div class="param-control" style="margin-left: 0;">
+          <fast-text-field value.bind="selectedRule.name" placeholder="Rule Name"></fast-text-field>
+        </div>
+
+        <div class="param-row">
+          Require all conditions to be true
+          <fast-switch checked.bind="useAndOperatorInRule" change.trigger="notifyChangeInRule()"></fast-switch>
+        </div>
+
+        <fast-card repeat.for="condition of selectedRule.conditions || []" class="condition-card">
+          <div class="param-row">
+            <label>Key</label>
+          </div>
+          <div class="param-control">
+            <fast-text-field value.bind="condition.key" placeholder="Key" change.trigger="notifyChangeInRule()" input.trigger="notifyChangeInRule()">
+              <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openKeyListForCondition($index)" class="${keyValues ? '':'disabled'}"></fast-icon>
+            </fast-text-field>
+          </div>
+          <div class="param-row">
+            <label>Value</label>
+          </div>
+          <div class="param-control">
+            <fast-text-field value.bind="condition.value" placeholder="Value" change.trigger="notifyChangeInRule()" input.trigger="notifyChangeInRule()">
+              <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openValueListForCondition($index)" class="${keyValues[condition.key].length ? '':'disabled'}"></fast-icon>
+            </fast-text-field>
+          </div>
+          <div class="param-row">
+            <div class="param-condition-buttons">
+              <div class="param-condition-buttons-operators">
+                <fast-button appearance="${condition.operator === '<' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '<')">&lt;</fast-button>
+                <fast-button appearance="${condition.operator === '*' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '*')">*</fast-button>
+                <fast-button appearance="${condition.operator === '=' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '=')">=</fast-button>
+                <fast-button appearance="${condition.operator === '!=' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '!=')">!=</fast-button>
+                <fast-button appearance="${condition.operator === '>' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '>')">&gt;</fast-button>
+              </div>
+            </div>
+            <fast-button appearance="lightweight" hover-fill icon click.trigger="removeConditionFromRule($index)">
+              <fast-icon icon="Trash"></fast-icon>
+            </fast-button>
+          </div>
+        </fast-card>
+
+        <div class="button-text" style="margin-top: 8px;">
+          <fast-button appearance="lightweight" hover-fill click.trigger="addConditionToRule()">
+            <fast-icon icon="Plus" slot="start"></fast-icon>
+            New condition
+          </fast-button>
+        </div>
+      </div>
+    </template>
+  </fast-card>
+  
+
+</template>

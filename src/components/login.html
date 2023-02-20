@@ -1,0 +1,228 @@
+<template>
+  <require from="./login.css"></require>
+  <fast-next ref="nextElement" changed.trigger="scrollNextContentToTop($event)">
+    <fast-next-item id="identity">
+      <form submit.trigger="processIdentity($event)" novalidate>
+        <fast-stack small>
+          <h1 t="login.Welcome"></h1>
+          <h4 t="login.Login or create an account"></h4>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <template if.bind="loginWith === 'mobile'">
+              <p>
+                <fast-select t="[placeholder]login.Your country" placeholder="" value.bind="regionCode" change.trigger="countryChanged()" style="width: 100%;">
+                  <fast-option value="${countryCode}" repeat.for="countryCode of global.state.countries">${countryCode | countryName | t}</fast-option>
+                </fast-select>
+              </p>
+              <p if.bind="true">
+                <fast-text-field-login name="username" value.bind="mobile" pattern="[0-9]*" placeholder="${mobilePlaceholder}" change.trigger="mobileChanged()" keyup.trigger="mobileChanged()" style="width: 100%;" autocomplete="username" autofocus>
+                  <span class="start__region-code" slot="start">+${countryCode}</span>
+                </fast-text-field-login>
+              </p>
+            </template>
+            <template if.bind="loginWith === 'email'">
+              <p if.bind="true">
+                <fast-text-field-login name="username" value.bind="email" placeholder="${emailPlaceholder}" change.trigger="emailChanged()" keyup.trigger="emailChanged()" style="width: 100%;" autocomplete="username" autofocus>
+                  <fast-icon slot="start" icon="AtSymbol"></fast-icon>
+                </fast-text-field-login>
+              </p>
+            </template>
+            <input type="password" autocomplete="current-password" style="display:none;">
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="startCreatingAnAccount()">
+                <span t="login.Create an account"></span>
+              </fast-button>
+              <fast-button disabled.bind="login || (loginWith === 'mobile' && !isMobileValid) || (loginWith === 'email' && !isEmailValid)" appearance="accent" type="submit">
+                <fast-progress-ring slot="start" if.bind="loading"></fast-progress-ring>
+                <span t="login.Continue"></span>
+              </fast-button>
+            </p>
+            <p if.bind="suggestAccountCreation && ((loginWith === 'mobile' && isMobileValid) || (loginWith === 'email' && isEmailValid))">
+              <span t="login.We couldn't find any account for {{ username }} go ahead and" t-params.bind="{username: loginWith === 'email' ? email : mobile }"></span>
+              <fast-anchor t="login.Create one" appearance="hypertext" href="#" click.trigger="startCreatingAnAccount(false, $event)"></fast-anchor>
+            </p>
+          </fast-stack>
+        </fast-stack>
+      </form>
+    </fast-next-item>
+    <fast-next-item id="name">
+      <form submit.trigger="continueCreatingAnAccount($event)" novalidate>
+        <fast-stack small>
+          <h1 t="login.Create an account"></h1>
+          <h4 t="login.Whats your name"></h4>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <p if.bind="true">
+              <fast-text-field name="firstname" type="text" value.bind="firstname" t="[placeholder]login.Firstname" style="width: 100%;" autocomplete="given-name">
+                
+              </fast-text-field>
+            </p>
+            <p if.bind="true">
+              <fast-text-field name="firstname" type="text" value.bind="lastname" t="[placeholder]login.Lastname" style="width: 100%;" autocomplete="family-name">
+                
+              </fast-text-field>
+            </p>
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="backToLogin()" t="login.Back to login"></fast-button>
+              <fast-button appearance="accent" type="submit">
+                <span t="login.Continue"></span>
+              </fast-button>
+            </p>
+          </fast-stack>
+        </fast-stack>
+
+      </form>
+    </fast-next-item>
+    <fast-next-item id="create-account">
+      <form submit.trigger="requestValidationCode($event)" novalidate>
+        <fast-stack small>
+          <h1 if.bind="loginWith === 'mobile'" t="login.Enter your mobile and set a password"></h1>
+          <h1 if.bind="loginWith === 'email'" t="login.Enter your email and set a password"></h1>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <template if.bind="loginWith === 'mobile'">
+              <p>
+                <fast-select t="[placeholder]login.Your country" placeholder="" value.bind="regionCode" change.trigger="countryChanged()" style="width: 100%;">
+                  <fast-option value="${countryCode}" repeat.for="countryCode of global.state.countries">
+                    ${countryCode | countryName | t}
+                    +${countryCodeNumber(countryCode)}
+                  </fast-option>
+                </fast-select>
+              </p>
+              <p if.bind="true">
+                <fast-text-field-login name="username" value.bind="mobile" pattern="[0-9]*" placeholder="${mobilePlaceholder}" change.trigger="mobileChanged()" keyup.trigger="mobileChanged()" style="width: 100%;" autocomplete="username"></fast-text-field-login>
+              </p>
+            </template>
+            <template if.bind="loginWith === 'email'">
+              <p if.bind="true">
+                <fast-text-field-login name="username" value.bind="email" placeholder="${emailPlaceholder}" change.trigger="emailChanged()" keyup.trigger="emailChanged()" style="width: 100%;" autocomplete="username">
+                  <fast-icon slot="start" icon="AtSymbol"></fast-icon>
+                </fast-text-field-login>
+              </p>
+            </template>
+            <p if.bind="true">
+              <fast-text-field-login type="password" value.bind="password" t="[placeholder]login.Min 8 characters" change.trigger="passwordChanged()" keyup.trigger="passwordChanged()" style="width: 100%;" autocomplete="new-password">
+                <fast-icon slot="start" icon="Key"></fast-icon>
+              </fast-text-field-login>
+            </p>
+
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="backToLogin()" t="login.Back to login"></fast-button>
+              <fast-button disabled.bind="!isPasswordValid || loading" appearance="accent" type="submit">
+                <fast-progress-ring slot="start" if.bind="loading"></fast-progress-ring>
+                <span t="login.Continue"></span>
+              </fast-button>
+            </p>
+
+          </fast-stack>
+        </fast-stack>
+
+      </form>
+    </fast-next-item>
+    <fast-next-item id="validate-account">
+      <form submit.trigger="validateAccount($event)" novalidate>
+        <fast-stack small>
+          <h1 t="login.Validate your account"></h1>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <p>
+              <label t="login.We just sent you a code to the mobile number {{ mobile }} it can take several minutes to arrive" if.bind="loginWith === 'mobile'" t-params.bind="{mobile: mobile}"></label>
+              <label t="login.We just sent you a code to the email {{ email }} it can take several minutes to arrive" if.bind="loginWith === 'email'" t-params.bind="{email: email}"></label>
+            </p>
+            <p if.bind="true">
+              <fast-text-field-login value.bind="validationCode" placeholder="1234" change.trigger="validationCodeChanged()" keyup.trigger="validationCodeChanged()" style="width: 100%;" autocomplete="one-time-code" ignore-dico>
+                <fast-icon slot="start" icon="Key"></fast-icon>
+              </fast-text-field-login>
+            </p>
+            
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="backToLogin()" t="login.Back to login"></fast-button>
+              <fast-button disabled.bind="!isValidationCodeValid || validated || validating" appearance="accent" type="submit">
+                <fast-progress-ring slot="start" if.bind="loading"></fast-progress-ring>
+                <fast-icon icon="Check" slot="start" if.bind="validated"></fast-icon>
+                <span t="login.Validate my account"></span>
+              </fast-button>
+            </p>
+
+            <p if.bind="invalidCode">
+              <fast-button appearance="accent" important click.delegate="resentValidationCode()"><span t="login.Resend code"></span></fast-button>
+            </p>
+
+          </fast-stack>
+        </fast-stack>
+
+      </form>
+    </fast-next-item>
+    <fast-next-item id="login-with-password">
+      <form submit.trigger="loginWithPassword($event)" novalidate>
+        <fast-stack small>
+          <h1 t="login.We are happy to see you again"></h1>
+          <h4 if.bind="loginWith === 'mobile'" t="login.You are logging in with {{ mobile }}" t-params.bind="{mobile: mobile}"></h4>
+          <h4 if.bind="loginWith === 'email'" t="login.You are logging in with {{ email }}" t-params.bind="{email: email}"></h4>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <input type="text" name="username" value="${email || mobile}" autocomplete="username" style="display: none;">
+            <p if.bind="true">
+              <fast-text-field-login name="password" type="password" value.bind="password" placeholder="********" change.trigger="passwordChanged()" keyup.trigger="passwordChanged()" style="width: 100%;" autocomplete="current-password" ignore-dico>
+                <fast-icon slot="start" icon="Key"></fast-icon>
+              </fast-text-field-login>
+            </p>
+
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="backToLogin()" t="login.Back to login"></fast-button>
+              <fast-button disabled.bind="loading || !isPasswordValid" appearance="accent" type="submit">
+                <fast-progress-ring slot="start" if.bind="loading"></fast-progress-ring>
+                <span t="login.Login"></span>
+              </fast-button>
+            </p>
+
+            <p>
+              <fast-button appearance="lightweight" click.trigger="forgotPassword()" t="login.I forgot my password"></fast-button>
+            </p>
+
+          </fast-stack>
+        </fast-stack>
+
+      </form>
+    </fast-next-item>
+    <fast-next-item id="reset-password">
+      <form submit.trigger="resetPassword($event)" novalidate>
+        <fast-stack small>
+          <h1 t="login.Fill in the code and choose a new password"></h1>
+
+          <fast-stack style="max-width: 400px; margin-top: 32px;">
+            <p>
+              <label t="login.We sent you a code to the mobile number {{ mobile }} it can take several minutes to arrive" if.bind="loginWith === 'mobile'" t-params.bind="{mobile: mobile}"></label>
+              <label t="login.We sent you a code to the email {{ email }} it can take several minutes to arrive" if.bind="loginWith === 'email'" t-params.bind="{email: email}"></label>
+            </p>
+            <p if.bind="true">
+              <fast-text-field-login value.bind="resetPasswordCode" placeholder="1234" change.trigger="resetPasswordCodeChanged()" keyup.trigger="resetPasswordCodeChanged()" style="width: 100%;" autocomplete="one-time-code" ignore-dico >
+                <fast-icon slot="start" icon="Key"></fast-icon>
+              </fast-text-field-login>
+            </p>
+            <p>
+              <label t="login.Choose a new password"></label>
+            </p>
+            <p if.bind="true">
+              <fast-text-field-login type="password" value.bind="password" placeholder="****" change.trigger="passwordChanged()" keyup.trigger="passwordChanged()" style="width: 100%;" autocomplete="new-password" ignore-dico >
+                <fast-icon slot="start" icon="Key"></fast-icon>
+              </fast-text-field-login>
+            </p>
+
+            <p style="display: grid; grid-template-columns: 1fr min-content;">
+              <fast-button appearance="lightweight" style="justify-self: start;" click.trigger="backToLogin()" t="login.Back to login"></fast-button>
+              <fast-button disabled.bind="loading || !isPasswordValid || !isResetPasswordCodeValid" appearance="accent" type="submit">
+                <fast-progress-ring slot="start" show.bind="loading"></fast-progress-ring>
+                <span t="login.Change my password"></span>
+              </fast-button>
+            </p>
+
+          </fast-stack>
+        </fast-stack>
+
+      </form>
+    </fast-next-item>
+
+  </fast-next>
+
+</template>

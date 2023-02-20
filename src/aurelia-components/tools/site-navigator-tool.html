@@ -1,0 +1,35 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./site-navigator-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}" disabled.bind="!siteManager.siteObject.children.length">
+    <fast-icon icon="Home"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel-with-sticky-title site-navigator-tool-panel" hidden>
+    <template if.bind="!selectedBuilding">
+      <p class="tool-panel-sticky-title"><span class="text-hint" t="app.Site Navigator"></span></p>
+      <fast-menu>
+        <fast-menu-item repeat.for="building of buildings" click.trigger="selectBuilding(building)">
+          <fast-icon slot="start" icon="Home"></fast-icon>
+          ${building.userData.properties.name || 'Building'}
+        </fast-menu-item>
+      </fast-menu>
+    </template>
+    <template if.bind="selectedBuilding">
+      <div class="button-text">
+        <fast-button appearance="lightweight" click.trigger="unselectBuilding()" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <p><span class="text-hint">${selectedBuilding.userData.properties.name || 'Building'}</p>
+      </div>
+      <fast-menu>
+        <fast-menu-item class="${storey === selectedLevel ? 'expanded' : ''}" repeat.for="storey of storeys" click.trigger="selectLevel(storey)">
+          <fast-icon slot="start" icon="Minus"></fast-icon>
+          ${storey.userData.properties.name || storey.uuid}
+        </fast-menu-item>
+      </fast-menu>
+    </template>
+  </fast-card>
+  
+
+</template>

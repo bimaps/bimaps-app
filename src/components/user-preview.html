@@ -1,0 +1,19 @@
+<template bindable="name,title">
+  <require from="./user-preview.css"></require>
+  <ux-list style="max-width: 300px;margin:auto;" class="user-preview">
+    <ux-list-item>
+      <div class="ux-list-item__detail">
+        <ux-icon icon="person" class="user-icon"></ux-icon>
+      </div>
+      <div class="ux-list-item__content">
+        ${name}
+        <div class="ux-list-item__secondary-content">
+          ${title}
+        </div>
+      </div>
+      <div class="ux-list-item__action-item">
+        <ux-icon icon="keyboard_arrow_down"></ux-icon>
+      </div>
+    </ux-list-item>
+  </ux-list>
+</template>

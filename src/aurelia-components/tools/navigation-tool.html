@@ -1,0 +1,65 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./navigation-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}" disabled.bind="!siteManager.siteObject.children.length">
+    <fast-icon icon="Walking"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel-bottom tool-panel-navigation" hidden>
+    <div class="tool-panel-navigation-current-storey" if.bind="currentStorey">${currentStorey.userData.building} - ${currentStorey.userData.storey}</div>
+    <div style="margin: 0; display: flex; gap: 16px; margin-bottom: 8px; align-items: center;">
+      <div style="display: flex; align-items: center;">
+        <fast-button appearance="${isSelectingFrom ? 'accent' : 'lightweight'}" icon click.trigger="selectFrom()">
+          <fast-icon icon="CursorClick" size="sm"></fast-icon>
+        </fast-button>
+        <span class="text-hint" style="padding-right: 8px;">From: </span>
+        <span if.bind="from">${name(from)}</span>
+        <span else>Building Entry</span>
+      </div>
+      <fast-button click.trigger="revert()" appearance="lightweight" icon disabled.bind="!to && !from">
+        <fast-icon icon="Selector" style="transform: rotate(90deg);"></fast-icon>
+      </fast-button>
+      <div style="display: flex; align-items: center;">
+        <fast-button appearance="${isSelectingTo ? 'accent' : 'lightweight'}" icon click.trigger="selectTo()">
+          <fast-icon icon="CursorClick" size="sm"></fast-icon>
+        </fast-button>
+        <span class="text-hint" style="padding-right: 8px;">To: </span>
+        <span>${name(to)}</span>
+      </div>
+      <div style="margin-left: auto">
+        <fast-button if.bind="navigationPathObject" appearance="lightweight" icon click.trigger="cancelNav()"><fast-icon icon="X"></fast-icon></fast-button>
+        <fast-button if.bind="!navigationPathObject" appearance="lightweight" icon click.trigger="toggleNavigationPathObject(true)" disabled.bind="!to"><fast-icon icon="ArrowNarrowRight"></fast-icon></fast-button>
+      </div>
+    </div>
+    <!-- <p style="display: none;">
+      <fast-button click.trigger="toggleNavigationPathObject()">Toggle Navigation Path</fast-button>
+    </p> -->
+
+    <p class="tool-panel-navigation-playbar" style="margin: 0;">
+      <span>
+        <fast-button appearance="${playing ? 'accent' : 'neutral'}" icon click.trigger="togglePlaying()">
+          <fast-icon show.bind="playing" icon="Pause"></fast-icon>
+          <fast-icon show.bind="!playing"icon="Play"></fast-icon>
+        </fast-button>
+      </span>
+      <span style="width: 100%; align-self: end;">
+        <fast-slider value.bind="percentage" min="0" max="1" step="0.001" change.trigger="updateNavigationPosition()"></fast-slider>
+      </span>
+      <span style="display: inline-flex; gap: 8px;">
+        <fast-button appearance="${navigationStyle === '3d' ? 'accent' : 'neutral'}" click.trigger="setNavigationStyle('3d')" icon>
+          <fast-icon icon="VideoCamera"></fast-icon>
+        </fast-button>
+        <fast-button appearance="${navigationStyle === 'immersive' ? 'accent' : 'neutral'}" click.trigger="setNavigationStyle('immersive')" icon>
+          <fast-icon icon="LocationMarker"></fast-icon>
+        </fast-button>
+      </span>
+    </p>
+
+    <p style="display: none;">
+      <fast-button appearance="lightweight" click.trigger="logAllPaths()">Log all path</fast-button>
+    </p>
+
+  </fast-card>
+  
+
+</template>

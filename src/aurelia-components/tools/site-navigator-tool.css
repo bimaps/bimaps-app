@@ -1,0 +1,12 @@
+.site-navigator-tool-panel {
+  max-height: 50vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.site-navigator-tool-panel .children-objects {
+  padding-left: 16px;
+}
+/* the following class is added to canvas if there is a hoverable element like a building to open */
+.site-navigator-tool-hoverable {
+  cursor: pointer;
+}

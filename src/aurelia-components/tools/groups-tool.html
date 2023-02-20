@@ -1,0 +1,132 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./groups-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="UserGroup"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-groups-panel ${isFullScreen ? 'tool-panel-fullscreen' : ''}" hidden>
+
+    <template if.bind="!selectedGroup">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="toggleOpened()" hover-fill icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        Groups
+        <fast-button appearance="lightweight" hover-fill icon click.trigger="newGroup()" if.bind="rights.canWriteGroups">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+      </div>
+      <fast-menu if.bind="groups.length" class="tool-panel-content-under-header">
+        <fast-menu-item repeat.for="group of groups" click.trigger="editGroup(group.id)">
+          ${group.name}
+        </fast-menu-item>
+      </fast-menu>
+      <div class="button-text-button">
+        <fast-button if.bind="!groups.length" click.trigger="newGroup()">Create your first group</fast-button>
+      </div>
+    </template>
+
+    <template if.bind="selectedGroup">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="unselectGroup()" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <span class="text-hint">Edit Group</span>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="enableFullScreen()" if.bind="!isFullScreen">
+          <fast-icon icon="ArrowsExpand"></fast-icon>
+        </fast-button>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="disableFullScreen()" if.bind="isFullScreen">
+          <fast-icon icon="ArrowsCondense"></fast-icon>
+        </fast-button>
+      </div>
+
+      <form>
+        <div class="tool-panel-content-under-header">
+          <div class="param-control" style="margin-left: 0;">
+            <fast-text-field value.bind="selectedGroup.name" placeholder="Group Name"></fast-text-field>
+          </div>
+  
+          <div class="form-field">
+            <div>
+              <fast-checkbox checked.bind="restrictGroupToSites">Applies only to selected sites</fast-checkbox>
+            </div>
+            <fast-menu if.bind="restrictGroupToSites" class="site-selector" fast-menu-value.bind="selectedGroup.siteIds">
+              <fast-menu-item repeat.for="site of sites" fast-menu-item-value.bind="site.id">
+                ${site.name}
+              </fast-menu-item>
+            </fast-menu>
+          </div>
+          <div class="form-field">
+            <div class="text-button">
+              <p>Members</p>
+              <fast-button appearance="lightweight" hover-fill icon click.trigger="addUser()">
+                <fast-icon icon="Plus"></fast-icon>
+              </fast-button>
+            </div>
+            <fast-menu class="groups-tool__members-roles" if.bind="selectedGroup.members.length">
+              <fast-menu-item repeat.for="member of selectedGroup.members">
+                ${userFullName(member.userId)}
+                <fast-select slot="end" value.bind="member.role">
+                  <fast-option add-selected.bind="member.role === 'member'" value="member">Member</fast-option>
+                  <fast-option add-selected.bind="member.role === 'manager'" value="manager">Manager</fast-option>
+                </fast-select>
+              </fast-menu-item>
+            </fast-menu>
+          </div>
+          <div class="form-field">
+            <div>
+              <fast-checkbox checked.bind="selectedGroup.isPublic">Is public ?</fast-select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Allowed Actions</label>
+            <fast-menu class="actions-selector" fast-menu-value.bind="selectedGroup.actions">
+              <fast-menu-item fast-menu-item-value="site_read">site_read</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="site_write">site_write</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="signage_read">signage_read</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="signage_write">signage_write</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="theme_read">theme_read</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="theme_write">theme_write</fast-menu-item>
+              <fast-menu-item fast-menu-item-value="group_write">group_write</fast-menu-item>
+            </fast-menu>
+          </div>
+          <div class="form-field" if.bind="hasThemeAction(selectedGroup.actions, selectedGroup.actions.length)">
+            <div>
+              <fast-checkbox checked.bind="restrictGroupToThemes">Applies only to selected themes</fast-select>
+            </div>
+            <fast-menu if.bind="restrictGroupToThemes" class="theme-selector" fast-menu-value.bind="selectedGroup.themeIds">
+              <fast-menu-item repeat.for="theme of themes" fast-menu-item-value.bind="theme.id">
+                ${theme.name}
+              </fast-menu-item>
+            </fast-menu>
+          </div>
+  
+        </div>
+        <div class="button-text-button" style="margin-top: 8px;">
+          <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteGroup()" disabled.bind="!selectedGroup.id">Delete</fast-button>
+          <p></p>
+          <fast-button appearance="accent" click.trigger="saveGroup()">Save</fast-button>
+        </div>
+      </form>
+    </template>
+
+  </fast-card>
+
+  <fast-dialog ref="usersSelector" hidden class="users-select-dialog">
+    <div class="dialog-head">
+      <fast-icon icon="User"></fast-icon>
+      <p>Select User</p>
+      <fast-button appearance="lightweight" click.trigger="closeUsersSelector()" icon>
+        <fast-icon icon="X"></fast-icon>
+      </fast-button>
+    </div>
+
+    <div class="dialog-content">
+      <fast-menu>
+        <fast-menu-item repeat.for="user of users" click.trigger="closeUsersSelector(user)">${user.firstname} ${user.lastname}</fast-menu-item>
+      </fast-menu>
+    </div>
+  </fast-dialog>
+
+</template>

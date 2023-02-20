@@ -1,0 +1,27 @@
+.tool-groups-panel {
+  min-width: 300px;
+}
+.users-select-dialog {
+  --dialog-width: calc(min(380px, 80vw));
+}
+.group-form label {
+  display: block;
+  margin-bottom: 4px;
+}
+.group-form .form-field {
+  margin-bottom: 8px;
+}
+.group-form .site-selector,
+.group-form .theme-selector {
+  max-height: 500px;
+  overflow-y: auto;
+}
+.groups-tool__members-roles fast-menu-item {
+  grid-template-columns: 0 1fr min-content;
+  gap: 8px;
+}
+.groups-tool__members-roles fast-menu-item fast-select {
+  min-width: auto;
+  width: 150px;
+  margin-inline-end: 0;
+}

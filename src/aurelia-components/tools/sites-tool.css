@@ -1,0 +1,12 @@
+.tool-sites-panel {
+  min-width: 300px;
+}
+.sites-tool__option-selector fast-menu-item {
+  grid-template-columns: 0 1fr min-content;
+  gap: 8px;
+}
+.sites-tool__option-selector fast-menu-item fast-select {
+  min-width: auto;
+  width: 100px;
+  margin-inline-end: 0;
+}

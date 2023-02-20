@@ -1,0 +1,15 @@
+.tool-panel-navigation {
+  width: 70vw;
+  max-width: 70vw;
+  z-index: 400;
+}
+
+.tool-panel-navigation-playbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.tool-panel-navigation-current-storey {
+  width: 100%;
+  padding: 8px;
+}

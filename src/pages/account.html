@@ -1,0 +1,16 @@
+<template>
+  <require from="./account.css"></require>
+  <section>
+    <h1 style="text-align:center;" t="account.My Account"></h1>
+
+    <fast-menu style="margin: auto;">
+      <fast-menu-item click.trigger="global.navigateToRoute('home')">Go to Viewer</fast-menu-item>
+      <fast-menu-item click.trigger="global.navigateToRoute('admin')">Go to Admin</fast-menu-item>
+      <fast-menu-item click.trigger="global.navigateToRoute('profile')">My Profile</fast-menu-item>
+      <fast-menu-item click.trigger="global.navigateToRoute('credentials')">My Credentials</fast-menu-item>
+      <fast-menu-item click.trigger="global.logout()">Logout</fast-menu-item>
+    </fast-menu>
+
+  </section>
+
+</template>

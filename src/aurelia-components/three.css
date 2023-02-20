@@ -1,0 +1,48 @@
+.aurelia-three {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.aurelia-three > canvas {
+  width: 100%;
+  height: 100%;
+  background: var(--three-canvas-background);
+}
+.aurelia-three > .top-indicator {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.aurelia-three > .toolbar {
+  position: absolute;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.aurelia-three > .left-toolbar {
+  left: 16px;
+}
+.aurelia-three > .right-toolbar {
+  right: 16px;
+}
+.aurelia-three > .activity-panel {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.aurelia-three > .activity-panel > div {
+  width: 200px;
+  background: var(--neutral-fill-rest);
+  color: var(--neutral-foreground-rest);
+  padding: 4px;
+}

@@ -1,0 +1,26 @@
+.object-property {
+  margin-bottom: 8px;
+}
+.object-property-label {
+  font-size: 10px;
+  font-weight: bold;
+}
+.object-property-value + .object-property-value {
+  margin-top: 8px;
+}
+.object-property-pset {
+  padding-left: 8px;
+}
+
+.object-property-clickable {
+  cursor: pointer;
+}
+
+.button-text-footer {
+  text-align: right;
+  margin: 8px 0 4px 0;
+}
+
+.property-inside-card {
+  padding-left: 8px;
+}

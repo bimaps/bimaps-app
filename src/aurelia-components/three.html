@@ -1,0 +1,25 @@
+<template class="aurelia-three">
+  <require from="./three.css"></require>
+  <canvas ref="canvas" id="aurelia-three-canvas"></canvas>
+  <div class="top-indicator">
+    <slot name="top-indicator"></slot>
+  </div>
+  <div class="toolbar left-toolbar" id="aurelia-three-left-toolbar">
+    <slot name="left-toolbar"></slot>
+  </div>
+  <div class="toolbar right-toolbar" id="aurelia-three-right-toolbar">
+    <slot name="right-toolbar"></slot>
+  </div>
+  <div class="active-tool-settings">
+    <slot name="active-tool-settings"></slot>
+  </div>
+  <div class="information-panel">
+    <slot name="information-panel"></slot>
+  </div>
+  <div class="activity-panel">
+    <div repeat.for="activity of activities">
+      <label>${activity.label}</label>
+      <span if.bind="activity.percentage">${activity.percentage}%</span>
+    </div>
+  </div>
+</template>

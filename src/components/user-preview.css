@@ -1,0 +1,16 @@
+/* USER PREVIEW */
+.user-preview ux-icon {
+  color: var(--aurelia-ux--design-primary);
+}
+ux-icon.user-icon {
+  background: var(--aurelia-ux--design-primary);
+  color: var(--aurelia-ux--design-primary-foreground);
+  border-radius: 100%;
+  --aurelia-ux--icon-size: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+ux-icon.user-icon > svg {
+  --aurelia-ux--icon-size: 24px;
+}

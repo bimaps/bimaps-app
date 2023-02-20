@@ -1,0 +1,31 @@
+.quick-login {
+  margin: 32px;
+}
+.quick-login form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.importer {
+  margin: 32px;
+}
+.importer form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.importer label {
+  font-weight: bold;
+}
+.importer p {
+  margin: 16px;
+}
+.importer p.error {
+  color: red;
+}
+
+.importer p.message {
+  color: blue;
+}

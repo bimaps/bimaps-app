@@ -1,0 +1,37 @@
+<template>
+  <div class="object-property">
+    <div class="object-property-label" if.bind="!isTripleValues">${key}</div>
+    <div class="object-property-value" if.bind="isPrimitive && !isTripleValues">${data[key]}</div>
+    
+    
+    <div class="object-property-pset" if.bind="isPset">
+      <div class="object-property-value" if.bind="data[key].description">${data[key].description}</div>
+      <object-property repeat.for="propKey of keys(data[key].properties)" data.bind="data[key].properties" key.bind="propKey" is-pset-property.bind="true"></object-property>
+    </div>
+    <div class="object-property-pset" if.bind="isPsetProperty">
+      <div class="object-property-value" if.bind="data[key].description">${data[key].description}</div>
+      
+      <template if.bind="data[key].type === 'IFCPROPERTYSINGLEVALUE'">
+        <div class="object-property-value" if.bind="data[key].valueType === 'IFCBOOLEAN'">
+          ${data[key].value === 'T' ? 'TRUE' : 'FALSE'}
+        </div>
+        <div class="object-property-value" else>
+          ${data[key].value}
+          <span if.bind="data[key].valueType === 'IFCPOWERMEASURE'">W</span>
+          <span if.bind="data[key].valueType === 'IFCAREAMEASURE'">m2</span>
+          <span if.bind="data[key].valueType === 'IFCVOLUMEMEASURE'">m3</span>
+          <span if.bind="data[key].valueType === 'IFCLENGTHMEASURE' || data[key].valueType === 'IFCPOSITIVELENGTHMEASURE'">m</span>
+        </div>
+      </template>
+      <template else>
+        <div class="object-property-value">
+          Pset type not yet supported: ${data[key].type}
+        </div>
+      </template>
+      
+      <object-property repeat.for="propKey of keys(data[key].properties)" data.bind="data[key].properties" key.bind="propKey" is-pset-property.bind="true"></object-property>
+    </div>
+    <div class="object-property-value" if.bind="isTripleValues && key=='x' || key=='_x'">${data['x'] | round:3} , ${data['y'] | round:3} , ${data['z'] | round:3}</div>
+    <div class="object-property-value" if.bind="!isPrimitive && !isPset && !isPsetProperty && !isTripleValues">Not primitive</div>
+  </div>
+</template>

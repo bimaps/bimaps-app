@@ -1,0 +1,18 @@
+<template>
+  <require from="./tools.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Sparkles"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel" hidden>
+    <div class="button-list">
+      <!-- <fast-button appearance="neutral" click.trigger="newRule()">New</fast-button> -->
+      <!-- <fast-button appearance="neutral" click.trigger="test()">Test</fast-button> -->
+      <!-- <fast-button appearance="neutral" click.trigger="testChildProcess()">Test Child Process</fast-button> -->
+      <fast-button appearance="neutral" click.trigger="nbCollaborators()">Nb collaborators</fast-button>
+      <fast-button appearance="neutral" click.trigger="externalObjects()">External</fast-button>
+    </div>
+  </fast-card>
+  
+
+</template>

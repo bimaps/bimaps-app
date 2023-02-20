@@ -1,0 +1,81 @@
+<template>
+  <require from="./importer.css"></require>
+  <div class="quick-login">
+    <h1>Login</h1>
+    <form if.bind="!connected">
+      <label>
+        Username
+        <input type="text" id="username" name="username" value.bind="username" />
+      </label>
+      <label>
+        Password
+        <input type="password" id="password" name="password" value.bind="password" />
+      </label>
+      <button  id="login" name="login" click.delegate="loginWithPassword()" type="submit">Login</button>
+    </form>
+    <div if.bind="connected">
+      <label id="connected-user">${username}</label>
+    </div>
+  </div>
+  <div class="importer">
+    <h1>Importer</h1>
+    <form>
+      <label>
+        URL
+        <input type="text" value.bind="url" />
+      </label>
+      <label>
+        Site ID
+        <input type="text" value.bind="siteId" />
+      </label>
+      <label>
+        Context
+        <input type="text" value.bind="context" />
+      </label>
+      <label>
+        Include Psets
+        <input type="checkbox" checked.bind="includePsets" />
+      </label>
+      <label>
+        Include Site Objects
+        <input type="checkbox" checked.bind="includeSiteObjects" />
+      </label>
+      <label>
+        Ignore buildings
+        <input type="checkbox" checked.bind="ignoreBuildings" />
+      </label>
+      <label>
+        Flatten
+        <input type="checkbox" checked.bind="flatten" />
+      </label>
+      <label>
+        Translate
+        <input type="checkbox" checked.bind="translate" />
+      </label>
+      <label>
+        Translation
+        <input type="text" value.bind="translation.x" />
+        <input type="text" value.bind="translation.y" />
+        <input type="text" value.bind="translation.z" />
+      </label>
+      <label>
+        Rotate
+        <input type="checkbox" checked.bind="rotate" />
+      </label>
+      <label>
+        Rotation
+        <input type="text" value.bind="rotation.x" />
+        <input type="text" value.bind="rotation.y" />
+        <input type="text" value.bind="rotation.z" />
+      </label>
+      <label>
+        Select a file to import
+        <input type="file" id="inputFileElement" ref="inputFileElement" value.bind="filepath" />
+      </label>
+      <p>${filepath}</p>
+      <button id="importFile" click.delegate="importFile()" type="submit">Import</button>
+    </form>
+    <p class="message" id="importerMessage">${message}</p>
+    <p class="error" id="importerError">${error}</p>
+  </div>
+</template>

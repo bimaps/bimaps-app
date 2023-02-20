@@ -1,0 +1,13 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./level-indicator.css"></require>
+
+  <template if.bind="active">
+    <fast-button
+      repeat.for="level of levels"
+      appearance="accent"
+      class="${levelActive.uuid === level.uuid ? 'active' : ''} ${slicingLevel.uuid === level.uuid ? 'slicing' : ''}"
+      click.trigger="toggleSlicing(level)">${name(level)}</fast-button>
+  </template>
+
+</template>

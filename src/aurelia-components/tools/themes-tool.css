@@ -1,0 +1,71 @@
+.tool-themes-panel {
+  min-width: 300px;
+}
+.theme-form {
+  --dialog-width: calc(min(380px, 80vw));
+}
+.theme-form label {
+  display: block;
+  margin-bottom: 4px;
+}
+.theme-form .form-field {
+  margin-bottom: 8px;
+}
+
+.tool-themes-panel fast-tabs::part(tablist) {
+  padding: 0;
+}
+.tool-themes-panel fast-tabs::part(activeIndicator) {
+  margin-top: 3px;
+  border-radius: 0;
+  height: 3px;
+}
+
+.tool-themes-panel fast-tab {
+  height: 30px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+
+.tool-themes-panel fast-card.condition-card {
+  background: rgba(255, 255, 255, 0.2);
+}
+.tool-themes-panel fast-card.condition-card + fast-card.condition-card {
+  margin-top: 4px;
+}
+.tool-themes-panel fast-card.condition-card fast-text-field fast-icon {
+  cursor: pointer;
+}
+.tool-themes-panel fast-card.condition-card fast-text-field fast-icon.disabled {
+  cursor: initial;
+  opacity: 0.3;
+}
+.tool-themes-panel .param-condition-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tool-themes-panel .param-condition-buttons-operators {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.tool-themes-panel .param-condition-buttons-operators fast-button {
+  --control-corner-radius: 20;
+  --density: -2;
+}
+.style-select-dialog {
+  --dialog-width: calc(min(380px, 80vw));
+}
+
+.tool-themes-panel .color-pallet input[type="color" i] {
+  appearance: auto;
+  width: 12px;
+  cursor: pointer;
+  box-sizing: content-box;
+  background-color: inherit;
+  border-width: inherit;
+  padding: 0px;
+}

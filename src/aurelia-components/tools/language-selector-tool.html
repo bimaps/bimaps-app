@@ -1,0 +1,12 @@
+<template>
+  <require from="./tools.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Translate"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel--no-padding" hidden>
+    <fast-button appearance="neutral" hover-fill click.trigger="selectLanguage('fr')" t="profile.French"></fast-button>
+    <fast-button appearance="neutral" hover-fill click.trigger="selectLanguage('en')" t="profile.English"></fast-button>
+  </fast-card>
+
+</template>

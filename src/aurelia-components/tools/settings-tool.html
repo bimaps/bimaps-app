@@ -1,0 +1,57 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./settings-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Cog"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-settings-panel" hidden>
+    <div class="button-text">
+      <fast-button appearance="lightweight" hover-fill icon click.trigger="toggleOpened()">
+        <fast-icon icon="ChevronLeft"></fast-icon>
+      </fast-button>
+      Settings
+    </div>
+    <fast-menu if.bind="rights.myRights">
+      <!-- <fast-menu-item click.trigger="openTool(sitesTool)" if.bind="sitesTool">
+        <fast-icon icon="LocationMarker" slot="start"></fast-icon>
+        Sites
+      </fast-menu-item> -->
+      <!-- <fast-menu-item click.trigger="openTool(themesTool)" if.bind="themesTool">
+        <fast-icon icon="ColorSwatch" slot="start"></fast-icon>
+        Themes
+      </fast-menu-item> -->
+      <fast-menu-item click.trigger="openTool(groupsTool)" if.bind="groupsTool && rights.canReadThemes(sitesTool.selectedSite.id)">
+        <fast-icon icon="UserGroup" slot="start"></fast-icon>
+        Groups
+      </fast-menu-item>
+      <fast-menu-item click.trigger="openTool(spatialStructureTool)" if.bind="spatialStructureTool">
+        <fast-icon icon="Home" slot="start"></fast-icon>
+        Spatial structure
+      </fast-menu-item>
+      <fast-menu-item click.trigger="openTool(signageTool)" if.bind="signageTool">
+        <fast-icon icon="Flag" slot="start"></fast-icon>
+        Signages
+      </fast-menu-item>
+      <fast-menu-item click.trigger="openTool(rulesTool)" if.bind="rulesTool">
+        <fast-icon icon="Sparkles" slot="start"></fast-icon>
+        Rules
+      </fast-menu-item>
+      <fast-menu-item click.trigger="openTool(sceneTool)" if.bind="sceneTool">
+        <fast-icon icon="CubeTransparent" slot="start"></fast-icon>
+        Scene
+      </fast-menu-item>
+      <fast-menu-item if.bind="!global.state.swissdata.authenticated" click.trigger="global.navigateToRoute('login')">
+        <fast-icon icon="User" slot="start"></fast-icon>
+        Login
+      </fast-menu-item>
+      <fast-menu-item if.bind="global.state.swissdata.authenticated" click.trigger="global.logout()">
+        <fast-icon icon="User" slot="start"></fast-icon>
+        Logout
+      </fast-menu-item>
+      <!-- <fast-menu-item click.trigger="testMyRights()">
+        Test my rights
+      </fast-menu-item> -->
+    </fast-menu>
+  </fast-card>
+</template>

@@ -1,0 +1,127 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./sites-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="LocationMarker"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-sites-panel" hidden>
+    <template if.bind="mode === 'list-sites'">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" hover-fill icon click.trigger="toggleOpened()">
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        Sites
+        <fast-button appearance="lightweight" hover-fill icon click.trigger="createNewSite()" if.bind="rights.canWriteSites">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+      </div>
+      <fast-menu>
+        <fast-menu-item repeat.for="site of sites" click.trigger="selectSite(site.id)" class="${site.id === selectedSite.id ? 'expanded':''}">
+          ${site.name}
+          <fast-button appearance="lightweight" icon hover-fill slot="end" click.trigger="editSite(site.id, $event)"  if.bind="rights.canWriteSite(site.id)">
+            <fast-icon icon="Cog"></fast-icon>
+          </fast-button>
+        </fast-menu-item>
+      </fast-menu>
+    </template>
+    <template if.bind="mode === 'edit-site'">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="backToList()" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        ${selectedSite.name}
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="editSiteName()" if.bind="rights.canWriteSites">
+          <fast-icon icon="Pencil"></fast-icon>
+        </fast-button>
+      </div>
+
+      <div class="tool-panel-content-under-header">
+        <fast-accordion>
+          <fast-accordion-item slot="item" if.bind="false">
+            <div slot="heading">Download</div>
+            <fast-menu>
+              <fast-menu-item click.trigger="downloadGIS()">
+                Download GIS
+              </fast-menu-item>
+              <fast-menu-item click.trigger="downloadAllObjects()">
+                Download All Objects
+              </fast-menu-item>
+            </fast-menu>
+          </fast-accordion-item>
+          <fast-accordion-item>
+            <div slot="heading">Import from files</div>
+            <import-from-files site-manager.bind="siteManager"></import-from-files>
+          </fast-accordion-item>
+          <fast-accordion-item slot="item">
+            <div slot="heading">Delete</div>
+            <fast-menu>
+              <fast-menu-item click.trigger="clearCache()">
+                Clear Site Cache
+              </fast-menu-item>
+              <fast-menu-item click.trigger="deleteSiteData()">
+                Delete Site Data
+              </fast-menu-item>
+            </fast-menu>
+          </fast-accordion-item>
+          <fast-accordion-item>
+            <div slot="heading">Objects Stats</div>
+            <site-objects-stats site-manager.bind="siteManager"></site-objects-stats>
+          </fast-accordion-item>
+          <fast-accordion-item slot="item">
+            <div slot="heading">Default Values</div>
+            <div class="param-row">
+              <span></span>
+              <label>Default public theme</label>
+              <fast-button appearance="outline" click.trigger="editDefaultPublicTheme()" disabled.bind="publicThemes.length === 0">
+                ${themeName(selectedSite.settings.defaultThemeId, publicThemes) || '-'}
+              </fast-button>
+            </div>
+            <div class="param-row" if.bind="false">
+              <span></span>
+              <label>Background color</label>
+              <input type="color" value.bind="backgroundColor" change.trigger="editbackgroundColor()" input.trigger="editbackgroundColor()" />
+            </div>
+            <div class="param-info">
+              <p class="text-hint">At least one public theme must be available for this site</p>
+            </div>
+
+            <template if.bind="buildings(siteManager.siteObject, siteManager.siteObject.children.length).length">
+              <div class="param-section"  repeat.for="building of buildings(siteManager.siteObject, siteManager.siteObject.children.length)">
+                <div class="param-section-head">
+                  ${building.userData.properties.name || 'Building'}
+                </div>
+                <div class="param-row">
+                  <span></span>
+                  <label>Default storey</label>
+                  <fast-button appearance="outline" click.trigger="editDefaultStoreyForBuilding(building)" disabled.bind="storeys(building, building.children.length).length === 0">
+                    ${selectedSite.settings[building.userData.properties.name].defaultStorey || '-'}
+                  </fast-button>
+                </div>
+                <div class="param-row">
+                  <fast-checkbox checked.bind="selectedSite.settings[building.userData.properties.name].translate"></fast-checkbox>
+                  <label>Translate</label>
+                  <fast-button appearance="outline" click.trigger="editBuildingTranslation(building)">${selectedSite.settings[building.userData.properties.name].translation.x}, ${selectedSite.settings[building.userData.properties.name].translation.y}, ${selectedSite.settings[building.userData.properties.name].translation.z}</fast-button>
+                </div>
+                <div class="param-row">
+                  <fast-checkbox checked.bind="selectedSite.settings[building.userData.properties.name].rotate"></fast-checkbox>
+                  <label>Rotate</label>
+                  <fast-button appearance="outline" click.trigger="editBuildingRotation(building)">${selectedSite.settings[building.userData.properties.name].rotation.x}, ${selectedSite.settings[building.userData.properties.name].rotation.y}, ${selectedSite.settings[building.userData.properties.name].rotation.z}</fast-button>
+                </div>
+              </div>
+
+            </template>
+          </fast-accordion-item>
+        </fast-accordion>
+
+      </div>
+      <div class="button-text-button" style="margin-top: 8px;">
+        <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteSite()" disabled.bind="!selectedSite.id">Delete</fast-button>
+        <span></span>
+        <fast-button appearance="accent" click.trigger="saveSiteSettings()" disabled.bind="!siteHasChanged">Save</fast-button>
+      </div>
+
+    </template>
+
+  </fast-card>
+</template>

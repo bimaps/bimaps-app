@@ -1,0 +1,522 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./themes-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="ColorSwatch"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-themes-panel ${isFullScreen ? 'tool-panel-fullscreen' : ''}" hidden>
+
+    <template if.bind="!selectedStyle && !editingTheme">
+      <fast-tabs activeid.bind="activeTab">
+        <fast-button appearance="lightweight" click.trigger="toggleOpened()" icon slot="start">
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <fast-tab slot="tab" id="themes" t="app.Themes"></fast-tab>
+        <fast-tab slot="tab" id="styles" if.bind="rights.canWriteThemes" t="app.Styles"></fast-tab>
+        <fast-button appearance="lightweight" click.trigger="newTheme()" icon slot="end" if.bind="activeTab === 'themes' && rights.canWriteThemes">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+        <fast-button appearance="lightweight" click.trigger="newStyle()" icon slot="end" if.bind="activeTab === 'styles' && rights.canWriteThemes">
+          <fast-icon icon="Plus"></fast-icon>
+        </fast-button>
+        <fast-panel slot="tabpanel" class="tool-panel-content-under-header">
+          <fast-menu if.bind="themes.length">
+            <fast-menu-item repeat.for="theme of themes" click.trigger="selectTheme(theme.id)" class="${selectedTheme === theme ? 'expanded' : ''}" if.bind="rights.canReadTheme(theme.id, siteId)">
+              ${theme.name}
+              <fast-button click.trigger="editTheme(theme.id, $event)" if.bind="rights.canWriteTheme(theme.id, siteId)" appearance="lightweight" hover-fill icon slot="end">
+                <fast-icon icon="Pencil"></fast-icon>
+              </fast-button>
+            </fast-menu-item>
+          </fast-menu>
+          <fast-button if.bind="!themes.length && rights.canWriteThemes" click.trigger="newTheme()" t="app.Create your first theme"></fast-button>
+          <div class="button-text-footer">
+            <fast-button appearance="${slicingAbove ? 'accent' : 'neutral'}" if.bind="rights.canWriteThemes" click.trigger="exportThemesStyles()" t="app.Export"></fast-button>
+            <fast-button appearance="${slicingAbove ? 'accent' : 'neutral'}" if.bind="rights.canWriteThemes" click.trigger="importThemesStyles()" t="app.Import"></fast-button>
+          </div>
+        </fast-panel>
+        <fast-panel slot="tabpanel" class="tool-panel-content-under-header" if.bind="rights.canWriteThemes">
+          <fast-menu if.bind="themes.length">
+            <fast-menu-item repeat.for="style of styles" click.trigger="editStyle(style.id)">
+              ${style.name}
+              <fast-button click.trigger="editStyle(style.id, $event)" if.bind="global.state.swissdata.authenticated" appearance="lightweight" hover-fill icon slot="end">
+                <fast-icon icon="Pencil"></fast-icon>
+              </fast-button>
+            </fast-menu-item>
+          </fast-menu>
+          <fast-button if.bind="!styles.length" click.trigger="newStyle()" t="app.Create your first style"></fast-button>
+        </fast-panel>
+      </fast-tabs>
+    </template>
+
+    <template if.bind="activeTab === 'styles' && selectedStyle">
+      <div class="button-text-button">
+        <fast-button appearance="lightweight" click.trigger="unselectStyle()" hover-icon icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <span class="text-hint" t="app.Edit Style"></span>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="enableFullScreen()" if.bind="!isFullScreen">
+          <fast-icon icon="ArrowsExpand"></fast-icon>
+        </fast-button>
+        <fast-button appearance="lightweight" hover-icon icon click.trigger="disableFullScreen()" if.bind="isFullScreen">
+          <fast-icon icon="ArrowsCondense"></fast-icon>
+        </fast-button>
+      </div>
+
+      <div class="tool-panel-content-under-header">
+
+        <div class="param-control" style="margin-left: 0;">
+          <fast-text-field value.bind="selectedStyle.name" placeholder="Style Name" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+        </div>
+
+        <fast-accordion>
+          <fast-accordion-item slot="item">
+            <div slot="heading" t="app.Visibility"></div>
+
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="affect.visible" change.trigger="notifyChangeInStyle('affect.visible', affect.visible) & debounce:50"></fast-checkbox>
+              <label t="app.Visible"></label>
+              <fast-switch if.bind="affect.visible" checked.bind="selectedStyle.visible" change.trigger="notifyChangeInStyle()"></fast-switch>
+            </div>
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="affect.opacity" change.trigger="notifyChangeInStyle('affect.opacity', affect.opacity) & debounce:50"></fast-checkbox>
+              <label t="app.Opacity"></label>
+              <fast-text-field if.bind="affect.opacity" value.bind="selectedStyle.opacity" type="number" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+            </div>
+            <div class="param-control"if.bind="affect.opacity">
+              <fast-slider value.bind="selectedStyle.opacity" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()"></fast-slider>
+            </div>
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="affect.maxOpacity" change.trigger="notifyChangeInStyle('affect.maxOpacity', affect.maxOpacity) & debounce:50"></fast-checkbox>
+              <label t="app.Maximum opacity"></label>
+              <fast-text-field if.bind="affect.maxOpacity" value.bind="selectedStyle.maxOpacity" type="number" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+            </div>
+            <div class="param-control" if.bind="affect.maxOpacity">
+              <fast-slider value.bind="selectedStyle.maxOpacity" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()"></fast-slider>
+            </div>
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="affect.color" change.trigger="notifyChangeInStyle('affect.color', affect.color) & debounce:50"></fast-checkbox>
+              <label t="app.Color"></label>
+              <input if.bind="affect.color" type="color" value.bind="selectedStyle.color" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()" />
+            </div>
+            <div class="param-row" if.bind="affect.color">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <label>Color by value</label>
+              <div class="button-text color-pallet" style="margin-top: 8px; max-width: 150px;">
+                <fast-button appearance="lightweight" hover-fill click.trigger="addStyleColorPallet()">
+                  <template if.bind="!selectedStyle.colorByValue.length">
+                    <fast-icon icon="Plus" slot="start"></fast-icon>
+                    Add Color Pallet
+                  </template>
+                  <template if.bind="selectedStyle.colorByValue.length">
+                   <span repeat.for="item of selectedStyle.colorByValue">
+                      <input type="color" value.bind="item" />
+                   </span>
+                  </template>
+                </fast-button>
+              </div>
+            </div>
+            <div class="param-row" if.bind="affect.color">
+                <label>Color key</label>
+            </div>
+            <div class="param-control" if.bind="affect.color">
+              <fast-text-field value.bind="selectedStyle.colorByValueKey" placeholder="Value" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()">
+                <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openKeyListForColorKey()" class="${keyValues ? '':'disabled'}"></fast-icon>
+              </fast-text-field>
+            </div>
+            <div class="param-control" if.bind="affect.color">
+              <fast-button appearance="lightweight" slot="item" hover-fill click.trigger="removeColorByValue()">
+                  <span>Clear color by value/key</span>
+              </fast-button>
+            </div>
+
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="affect.depthTest" change.trigger="notifyChangeInStyle('affect.depthTest', affect.depthTest) & debounce:50"></fast-checkbox>
+              <label>Depth Test</label>
+              <fast-switch if.bind="affect.depthTest" checked.bind="selectedStyle.depthTest" change.trigger="notifyChangeInStyle()"></fast-switch>
+            </div>
+            <div class="param-info" if.bind="affect.depthTest">
+              Disable if the material should be visible when placed behind other objects.
+            </div>
+          </fast-accordion-item>
+          <fast-accordion-item slot="item">
+            <div slot="heading">Label</div>
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <!-- <fast-checkbox checked.bind="affect.label" change.trigger="notifyChangeInStyle() & debounce:50"></fast-checkbox> -->
+              <fast-checkbox checked.bind="styleActivelabel" change.trigger="notifyChangeInStyle() & debounce:50"></fast-checkbox>
+              <label>Configure label</label>
+            </div>
+            <template if.bind="selectedStyle.label && affect.label">
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelVisible" change.trigger="notifyChangeInStyle('affect.labelVisible', affect.labelVisible) & debounce:50"></fast-checkbox>
+                <label>Visible</label>
+                <fast-switch if.bind="affect.labelVisible" checked.bind="selectedStyle.label.visible" change.trigger="notifyChangeInStyle()"></fast-switch>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelThreeD" change.trigger="notifyChangeInStyle('affect.labelThreeD', affect.labelThreeD) & debounce:50"></fast-checkbox>
+                <label>Label 3D</label>
+                <fast-switch if.bind="affect.labelThreeD" checked.bind="selectedStyle.label.threeD" change.trigger="notifyChangeInStyle()"></fast-switch>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelOpacity" change.trigger="notifyChangeInStyle('affect.labelOpacity', affect.labelOpacity) & debounce:50"></fast-checkbox>
+                <label>Opacity</label>
+                <fast-text-field if.bind="affect.labelOpacity" value.bind="selectedStyle.label.opacity" type="number" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-control" if.bind="affect.labelOpacity">
+                <fast-slider value.bind="selectedStyle.label.opacity" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()"></fast-slider>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelKey" change.trigger="notifyChangeInStyle('affect.labelKey', affect.labelKey) & debounce:50"></fast-checkbox>
+                <label>Key</label>
+                <fast-text-field if.bind="affect.labelKey" value.bind="selectedStyle.label.key" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" if.bind="affect.labelKey">
+                Use this property to take the label from a key (eg: `userData.labelProperty`) in the styled object.
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelTemplate" change.trigger="notifyChangeInStyle('affect.labelTemplate', affect.labelTemplate) & debounce:50"></fast-checkbox>
+                <label>Template</label>
+              </div>
+              <div class="param-control" if.bind="affect.labelTemplate">
+                <fast-text-field value.bind="selectedStyle.label.template" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" if.bind="affect.labelTemplate">
+                Use this property to compute a more complex label using several keys (eg: `#{object:userData.labelProperty} : #{object:userData.anotherProperty}`) in the styled object. Setting up this value will disable the `labelKey` value.
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelBackgroundColor" change.trigger="notifyChangeInStyle('affect.labelBackgroundColor', affect.labelBackgroundColor) & debounce:50"></fast-checkbox>
+                <label>Background Color</label>
+                <input if.bind="affect.labelBackgroundColor" type="color" value.bind="selectedStyle.label.backgroundColor" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()" />
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelTextColor" change.trigger="notifyChangeInStyle('affect.labelTextColor', affect.labelTextColor) & debounce:50"></fast-checkbox>
+                <label>Text Color</label>
+                <input if.bind="affect.labelTextColor" type="color" value.bind="selectedStyle.label.textColor" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()" />
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelScale" change.trigger="notifyChangeInStyle('affect.labelScale', affect.labelScale) & debounce:50"></fast-checkbox>
+                <label>Scale</label>
+                <fast-text-field if.bind="affect.labelScale" value.bind="selectedStyle.label.scale" type="number" min="0" max="10" step="0.1" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-control">
+                <fast-slider if.bind="affect.labelScale" value.bind="selectedStyle.label.scale" min="0" max="10" step="0.1" change.trigger="notifyChangeInStyle()"></fast-slider>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelPosition" change.trigger="notifyChangeInStyle('affect.labelPosition', affect.labelPosition) & debounce:50"></fast-checkbox>
+                <label>Position (X, Y, Z)</label>
+              </div>
+              <div class="param-row" if.bind="selectedStyle.label.threeD">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelRotation" change.trigger="notifyChangeInStyle('affect.labelRotation', affect.labelRotation) & debounce:50"></fast-checkbox>
+                <label>Rotation</label>
+                <fast-text-field if.bind="affect.labelRotation" value.bind="selectedStyle.label.rotation" type="number" min="0" max="360" step="1" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-row" if.bind="selectedStyle.label.threeD">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelIsHorizontal" change.trigger="notifyChangeInStyle('affect.labelIsHorizontal', affect.labelIsHorizontal) & debounce:50"></fast-checkbox>
+                <label>Is horizontal (default : vertical)</label>
+                <fast-switch if.bind="affect.labelIsHorizontal" checked.bind="selectedStyle.label.isHorizontal" change.trigger="notifyChangeInStyle()"></fast-switch>
+              </div>
+              <div class="param-control" if.bind="affect.labelPosition">
+                <fast-text-field value.bind="labelPosition.x" type="number" placeholder="X" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+                <fast-text-field value.bind="labelPosition.z" type="number" placeholder="Y" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+                <fast-text-field value.bind="labelPosition.y" type="number" placeholder="Z" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.labelPositionKey" change.trigger="notifyChangeInStyle('affect.labelPositionKey', affect.labelPositionKey) & debounce:50"></fast-checkbox>
+                <label>Position Key</label>
+                <fast-text-field if.bind="affect.labelPositionKey" value.bind="selectedStyle.label.positionKey" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" if.bind="affect.labelPositionKey">
+                Use this property to take the position from a key (eg: `userData.positionProperty`) in the styled object. Setting up this value will disable the `labelPosition` values;
+              </div>
+            </template>
+          </fast-accordion-item>
+          <fast-accordion-item slot="item">
+            <div slot="heading">Icon</div>
+            <div class="param-row">
+              <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+              <fast-checkbox checked.bind="styleActiveIcon" change.trigger="notifyChangeInStyle() & debounce:50"></fast-checkbox>
+              <label>Configure Icon</label>
+            </div>
+            <template if.bind="selectedStyle.icon && affect.icon">
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconVisible" change.trigger="notifyChangeInStyle('affect.iconVisible', affect.iconVisible) & debounce:50"></fast-checkbox>
+                <label>Visible</label>
+                <fast-switch if.bind="affect.iconVisible" checked.bind="selectedStyle.icon.visible" change.trigger="notifyChangeInStyle()"></fast-switch>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconOpacity" change.trigger="notifyChangeInStyle('affect.iconOpacity', affect.iconOpacity) & debounce:50"></fast-checkbox>
+                <label>Opacity</label>
+                <fast-text-field if.bind="affect.iconOpacity" value.bind="selectedStyle.icon.opacity" type="number" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-control" if.bind="affect.iconOpacity">
+                <fast-slider value.bind="selectedStyle.icon.opacity" min="0" max="1" step="0.01" change.trigger="notifyChangeInStyle()"></fast-slider>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconKey" change.trigger="notifyChangeInStyle('affect.iconKey', affect.iconKey) & debounce:50"></fast-checkbox>
+                <label>Key</label>
+                <fast-text-field if.bind="affect.iconKey" value.bind="selectedStyle.icon.key" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" if.bind="affect.iconKey">
+                Use this property to take the label from a key (eg: `userData.iconProperty`) in the styled object.
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconDefault" change.trigger="notifyChangeInStyle('affect.iconDefault', affect.iconDefault) & debounce:50"></fast-checkbox>
+                <label>Default</label>
+                <fast-text-field if.bind="affect.iconDefault" value.bind="selectedStyle.icon.default" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" >
+                Use this property to define the default icon if none are provided in the `iconKey`
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconBackgroundColor" change.trigger="notifyChangeInStyle('affect.iconBackgroundColor', affect.iconBackgroundColor) & debounce:50"></fast-checkbox>
+                <label>Background Color</label>
+                <input if.bind="affect.iconBackgroundColor" type="color" value.bind="selectedStyle.icon.backgroundColor" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()" />
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconTextColor" change.trigger="notifyChangeInStyle('affect.iconTextColor', affect.iconTextColor) & debounce:50"></fast-checkbox>
+                <label>Text Color</label>
+                <input if.bind="affect.iconTextColor" type="color" value.bind="selectedStyle.icon.textColor" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()" />
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconScale" change.trigger="notifyChangeInStyle('affect.iconScale', affect.iconScale) & debounce:50"></fast-checkbox>
+                <label>Scale</label>
+                <fast-text-field if.bind="affect.iconScale" value.bind="selectedStyle.icon.scale" type="number" min="0" max="10" step="0.1" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-control">
+                <fast-slider if.bind="affect.iconScale" value.bind="selectedStyle.icon.scale" min="0" max="10" step="0.1" change.trigger="notifyChangeInStyle()"></fast-slider>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconPosition" change.trigger="notifyChangeInStyle('affect.iconPosition', affect.iconPosition) & debounce:50"></fast-checkbox>
+                <label>Position (X, Y, Z)</label>
+              </div>
+              <div class="param-control" if.bind="affect.iconPosition">
+                <fast-text-field value.bind="iconPosition.x" type="number" placeholder="X" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+                <fast-text-field value.bind="iconPosition.z" type="number" placeholder="Y" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+                <fast-text-field value.bind="iconPosition.y" type="number" placeholder="Z" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-row">
+                <!-- debouncing the checkbox event avoid errors when computing the affeted values in hidden/shown fields -->
+                <fast-checkbox checked.bind="affect.iconPositionKey" change.trigger="notifyChangeInStyle('affect.iconPositionKey', affect.iconPositionKey) & debounce:50"></fast-checkbox>
+                <label>Position Key</label>
+                <fast-text-field if.bind="affect.iconPositionKey" value.bind="selectedStyle.icon.positionKey" change.trigger="notifyChangeInStyle()" input.trigger="notifyChangeInStyle()"></fast-text-field>
+              </div>
+              <div class="param-info" if.bind="affect.iconPositionKey">
+                Use this property to take the position from a key (eg: `userData.positionProperty`) in the styled object. Setting up this value will disable the `iconPosition` values;
+              </div>
+            </template>
+          </fast-accordion-item>
+
+          <!-- replace?: boolean;
+          default?: string;
+          key?: string;
+          scale?: number;
+          centroidMethod?: string;
+          position?: ThreePos;
+          positionKey?: string;
+          rotation?: ThreePos;
+          rotationKey?: string; -->
+          <fast-accordion-item slot="item">
+            <div slot="heading">Geometry</div>
+            <div class="param-row">
+              <fast-checkbox checked.bind="affect.geometryReplace" change.trigger="notifyChangeInStyle('affect.geometryReplace',affect.geometryReplace) & debounce:50"></fast-checkbox>
+              <label>Replace geometry</label>
+            </div>
+            <template if.bind="selectedStyle.geometry.replace && affect.geometryReplace">
+              <div class="param-row">
+                <fast-checkbox checked.bind="affect.geometryKey" change.trigger="notifyChangeInStyle('affect.geometryKey', affect.geometryKey) & debounce:50"></fast-checkbox>
+                <label>Key</label>
+                <fast-switch if.bind="affect.geometryKey" checked.bind="selectedStyle.geometry.key" change.trigger="notifyChangeInStyle()"></fast-switch>
+              </div>
+            </template>
+          </fast-accordion-item>
+        </fast-accordion>
+
+      </div>
+
+      <div class="button-text-button" style="margin-top: 8px;">
+        <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteStyle()" disabled.bind="!selectedStyle.id">Delete</fast-button>
+        <fast-button appearance="lightweight" style="margin-right: auto; margin-left: 16px" click.trigger="duplicateStyle()" disabled.bind="!selectedStyle.id">Duplicate</fast-button>
+        <fast-button appearance="accent" click.trigger="saveStyle()" disabled.bind="!styleHasChanged">Save</fast-button>
+      </div>
+
+    </template>
+
+    <template if.bind="activeTab === 'themes' && selectedTheme && editingTheme">
+
+      <template if.bind="!selectedStylingRule">
+        <div class="button-text-button">
+          <fast-button appearance="lightweight" click.trigger="unselectTheme()" hover-icon icon>
+            <fast-icon icon="ChevronLeft"></fast-icon>
+          </fast-button>
+          <span class="text-hint">Edit Theme</span>
+          <fast-button appearance="lightweight" hover-icon icon click.trigger="enableFullScreen()" if.bind="!isFullScreen">
+            <fast-icon icon="ArrowsExpand"></fast-icon>
+          </fast-button>
+          <fast-button appearance="lightweight" hover-icon icon click.trigger="disableFullScreen()" if.bind="isFullScreen">
+            <fast-icon icon="ArrowsCondense"></fast-icon>
+          </fast-button>
+        </div>
+
+        <div class="tool-panel-content-under-toolbar">
+          <div class="param-control" style="margin-left: 0;">
+            <fast-text-field value.bind="selectedTheme.name" placeholder="Theme Name" change.trigger="notifyChangeInTheme()" input.trigger="notifyChangeInTheme()"></fast-text-field>
+          </div>
+    
+          <div class="text-button">
+            <p>Styling Rules</p>
+            <fast-button appearance="lightweight" hover-fill icon click.trigger="addStylingRule()">
+              <fast-icon icon="Plus"></fast-icon>
+            </fast-button>
+          </div>
+          <fast-menu if.bind="selectedTheme.stylingRules.length">
+            <fast-menu-item
+              click.trigger="editStylingRule(stylingRule)"
+              reorderable-repeat.for="stylingRule of selectedTheme.stylingRules || []"
+              reorderable-dnd-handler-selector=".handler"
+              reorderable-after-reordering="stylingOrderChanged">
+              <fast-icon icon="MenuAlt4" slot="start" style="transform: scale(1, 0.8); cursor: pointer;" class="handler"></fast-icon>
+              ${stylingRule.name}
+            </fast-menu-item>
+          </fast-menu>
+        </div>
+
+        <div class="button-text-button" style="margin-top: 8px;">
+          <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteTheme()" disabled.bind="!selectedTheme.id">Delete</fast-button>
+          <span></span>
+          <fast-button appearance="accent" click.trigger="saveTheme()" disabled.bind="!themeHasChanged">Save</fast-button>
+        </div>
+      </template>
+      <template if.bind="selectedStylingRule">
+        <div class="button-text-button">
+          <fast-button appearance="lightweight" click.trigger="unselectStylingRule()" hover-icon icon>
+            <fast-icon icon="ChevronLeft"></fast-icon>
+          </fast-button>
+          <span class="text-hint">Edit Styling Rule</span>
+          <fast-button appearance="lightweight" hover-icon icon click.trigger="enableFullScreen()" if.bind="!isFullScreen">
+            <fast-icon icon="ArrowsExpand"></fast-icon>
+          </fast-button>
+          <fast-button appearance="lightweight" hover-icon icon click.trigger="disableFullScreen()" if.bind="isFullScreen">
+            <fast-icon icon="ArrowsCondense"></fast-icon>
+          </fast-button>
+        </div>
+
+        <div class="tool-panel-content-under-toolbar">
+          <div class="param-control" style="margin-left: 0;">
+            <fast-text-field value.bind="selectedStylingRule.name" placeholder="Styling Rule Name" change.trigger="notifyChangeInTheme()" input.trigger="notifyChangeInTheme()"></fast-text-field>
+          </div>
+    
+          <fast-accordion>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Conditions</div>
+
+              <div class="param-row">
+                Require all conditions to be true
+                <fast-switch checked.bind="useAndOperatorInStylingRule" change.trigger="notifyChangeInTheme()"></fast-switch>
+              </div>
+
+              <fast-card repeat.for="condition of selectedStylingRule.conditions || []" class="condition-card">
+                <div class="param-row">
+                  <label>Key</label>
+                </div>
+                <div class="param-control">
+                  <fast-text-field value.bind="condition.key" placeholder="Key" change.trigger="notifyChangeInTheme()" input.trigger="notifyChangeInTheme()">
+                    <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openKeyListForCondition($index)" class="${keyValues ? '':'disabled'}"></fast-icon>
+                  </fast-text-field>
+                </div>
+                <div class="param-row">
+                  <label>Value</label>
+                </div>
+                <div class="param-control">
+                  <fast-text-field value.bind="condition.value" placeholder="Value" change.trigger="notifyChangeInTheme()" input.trigger="notifyChangeInTheme()">
+                    <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openValueListForCondition($index)" class="${keyValues[condition.key].length ? '':'disabled'}"></fast-icon>
+                  </fast-text-field>
+                </div>
+                <div class="param-row">
+                  <div class="param-condition-buttons">
+                    <div class="param-condition-buttons-operators">
+                      <fast-button appearance="${condition.operator === '<' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '<')">&lt;</fast-button>
+                      <fast-button appearance="${condition.operator === '*' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '*')">*</fast-button>
+                      <fast-button appearance="${condition.operator === '=' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '=')">=</fast-button>
+                      <fast-button appearance="${condition.operator === '!=' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '!=')">!=</fast-button>
+                      <fast-button appearance="${condition.operator === '>' ? 'accent' : 'neutral'}" click.trigger="setConditionOperator($index, '>')">&gt;</fast-button>
+                    </div>
+                  </div>
+                  <fast-button appearance="lightweight" hover-fill icon click.trigger="removeConditionFromStylingRule($index)">
+                    <fast-icon icon="Trash"></fast-icon>
+                  </fast-button>
+                </div>
+              </fast-card>
+              <div class="button-text-button" style="margin-top: 8px;">
+                <fast-button appearance="lightweight" hover-fill click.trigger="addConditionToStylingRule()">
+                  <fast-icon icon="Plus" slot="start"></fast-icon>
+                  New condition
+                </fast-button>
+                <span></span>
+                <fast-button icon appearance="lightweight" click.trigger="showInfo('themes.rule.conditions')">
+                  <fast-icon icon="InformationCircle"></fast-icon>
+                </fast-button>
+              </div>
+
+  
+            </fast-accordion-item>
+            <fast-accordion-item slot="item">
+              <div slot="heading">Styles</div>
+              <fast-menu if.bind="selectedStylingRule.styles.length">
+                <fast-menu-item
+                  reorderable-repeat.for="style of selectedStylingRule.styles || []"
+                  reorderable-dnd-handler-selector=".handler"
+                  reorderable-after-reordering="styleOrderChanged">
+                  <fast-icon icon="MenuAlt4" slot="start" style="transform: scale(1, 0.8)" class="handler"></fast-icon>
+                  ${styleNameFromStyleId(style)}
+                  <fast-button appearance="lightweight" slot="end" hover-fill icon click.trigger="removeStyleFromStylingRule(style)">
+                    <fast-icon icon="Minus"></fast-icon>
+                  </fast-button>
+                </fast-menu-item>
+              </fast-menu>
+
+              <div class="button-text" style="margin-top: 8px;">
+                <fast-button appearance="lightweight" hover-fill click.trigger="addStyleToStylingRule()">
+                  <fast-icon icon="Plus" slot="start"></fast-icon>
+                  Add Style
+                </fast-button>
+              </div>
+            </fast-accordion-item>
+          </fast-accordion>
+        </div>
+
+        <div class="button-text-button" style="margin-top: 8px;">
+          <fast-button appearance="lightweight" style="margin-right: auto;" click.trigger="deleteStylingRule(selectedStylingRule)">Delete</fast-button>
+          <span></span>
+          <fast-button appearance="accent" click.trigger="saveStylingRule()" disabled.bind="!themeHasChanged">Save</fast-button>
+        </div>
+      </template>
+
+    </template>
+  </fast-card>
+</template>

@@ -1,0 +1,24 @@
+{
+  "debug": true,
+  "testing": true,
+  "appName": "BIMaps.io",
+  "swissdata": {
+    "host": "http://localhost:3000",
+    "apiKey": "enterYourKey",
+    "translationMemoryApiKey": "enterYourKey",
+    "translationMemoryHost": "http://localhost:3000"
+  },
+  "stripe": {
+    "apiKey": ""
+  },
+  "ipstack": {
+    "apiKey": ""
+  },
+  "clientUrl": "http://localhost:8082",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0,
+    "build": 0
+  }
+}

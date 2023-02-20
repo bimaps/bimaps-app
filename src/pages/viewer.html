@@ -1,0 +1,35 @@
+<template>
+  <require from="./viewer.css"></require>
+  <aurelia-three view-model.ref="three">
+
+    <sites-tool class="ghost" slot="left-toolbar" site-id.bind="siteId" site-manager.bind="siteManager" view-model.ref="sitesTool"></sites-tool>
+    <site-navigator-tool slot="left-toolbar" site-manager.bind="siteManager" view-model.ref="siteNavigator" sites-tool.bind="sitesTool"></site-navigator-tool>
+    <camera-tool slot="left-toolbar" site-manager.bind="siteManager"></camera-tool>
+    <language-selector-tool slot="left-toolbar" site-manager.bind="siteManager"></language-selector-tool>
+    <themes-tool slot="left-toolbar" view-model.ref="themesTool" site-id.bind="siteId"></themes-tool>
+    <!-- <navigation-tool slot="left-toolbar" site-manager.bind="siteManager"></navigation-tool> -->
+    <!-- <clipping-tool slot="left-toolbar"></clipping-tool> -->
+    <!-- <object-property-tool slot="left-toolbar" site-manager.bind="siteManager"></object-property-tool> -->
+    <!-- <select-tool slot="left-toolbar"></select-tool> -->
+    <!-- <filter-tool slot="left-toolbar" site-id.bind="siteId"></filter-tool> -->
+    <!-- <settings-tool
+    slot="left-toolbar"
+    groups-tool.bind="groupsTool"
+    spatial-structure-tool.bind="spatialStructureTool"
+    signage-tool.bind="signageTool"
+    rules-tool.bind="rulesTool"
+    scene-tool.bind="sceneTool"
+    ></settings-tool>   -->
+    <!-- <groups-tool class="ghost" slot="left-toolbar" view-model.ref="groupsTool" if.bind="rights.canManageOneGroup"></groups-tool> -->
+    <spatial-structure-tool class="ghost" slot="left-toolbar" site-manager.bind="siteManager"></spatial-structure-tool>
+    <!-- <signage-tool class="ghost" slot="left-toolbar" view-model.ref="signageTool" site-id.bind="siteId" site-manager.bind="siteManager" site-navigator.bind="siteNavigator" if.bind="rights.canWriteSignages(siteId)"></signage-tool> -->
+    <!-- <rules-tool class="ghost" slot="left-toolbar"  site-manager.bind="siteManager"></rules-tool> -->
+    <!-- <scene-tool class="ghost" slot="left-toolbar" site-manager.bind="siteManager"></scene-tool> -->
+
+    <!-- <level-indicator slot="right-toolbar"></level-indicator> -->
+    <search-tool slot="top-indicator" site-id.bind="siteId" site-manager.bind="siteManager"></search-tool>
+    <building-indicator slot="top-indicator" site-navigator.bind="siteNavigator"></building-indicator>
+
+  </aurelia-three>
+</template>
+

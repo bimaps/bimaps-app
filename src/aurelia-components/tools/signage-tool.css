@@ -1,0 +1,17 @@
+.tool-signage-panel {
+  min-width: 300px;
+}
+.signage-item label > span {
+  display: flex;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+}
+.signage-item label > span > img {
+  width: 25px;
+  height: 25px;
+}
+/* the following class is added to canvas if there is a hoverable element like a signage to select */
+.signage-tool-hoverable {
+  cursor: pointer;
+}

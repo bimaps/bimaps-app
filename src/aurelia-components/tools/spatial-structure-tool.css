@@ -1,0 +1,9 @@
+.spatial-structure-tool-panel {
+  max-height: 50vh;
+  min-width: 290px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.spatial-structure-tool-panel .children-objects {
+  padding-left: 16px;
+}

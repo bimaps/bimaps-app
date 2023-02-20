@@ -1,0 +1,9 @@
+<template class="building-indicator ${siteNavigator.selectedBuildingName ? '' : 'building-indicator__empty'}">
+  <require from="./building-indicator.css"></require>
+  <span class="building-name" if.bind="siteNavigator.selectedBuildingName">${siteNavigator.selectedBuildingName}</span>
+  <span class="storey-name" if.bind="siteNavigator.selectedLevelName">-</span>
+  <span class="storey-name" if.bind="siteNavigator.selectedLevelName">${siteNavigator.selectedLevelName}</span>
+  <fast-button appearance="lightweight" hover-fill icon class="close-button" if.bind="siteNavigator.selectedBuildingName" click.trigger="close()">
+    <fast-icon icon="X"></fast-icon>
+  </fast-button>
+</template>

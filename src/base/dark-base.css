@@ -1,0 +1,25 @@
+.dark {
+  background: var(--aurelia-ux--design-primary);
+  --aurelia-ux--button-background: #01DF9B;
+  --aurelia-ux--button-foreground: #fff;
+  --aurelia-ux--input-background: rgba(0, 0, 0, 0.2);
+  --aurelia-ux--input-foreground: #fff;
+  --aurelia-ux--input-foreground-label: #dadada;
+  --aurelia-ux--input-active-color: #7BE0DD;
+  --aurelia-ux--input-background-hover: rgba(0, 0, 0, 0.3);
+}
+
+.dark .ux-button--text {
+  --aurelia-ux--button-background: #fff;
+}
+
+.dark,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark p {
+  color: var(--aurelia-ux--design-primary-foreground);
+}

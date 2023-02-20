@@ -1,0 +1,14 @@
+<template>
+  <require from="./tools.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="VideoCamera"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel--no-padding" hidden>
+    <fast-button appearance="lightweight" hover-fill click.trigger="top()">Top</fast-button>
+    <fast-button appearance="lightweight" hover-fill click.trigger="nav3d()">3D</fast-button>
+    <!-- <fast-button appearance="lightweight" hover-fill click.trigger="log()">Log</fast-button> -->
+  </fast-card>
+  
+
+</template>

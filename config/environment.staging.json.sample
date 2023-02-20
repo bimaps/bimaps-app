@@ -1,0 +1,14 @@
+{
+  "debug": true,
+  "testing": false,
+  "swissdata": {
+    "host": "https://api.example.com/stage"
+  },
+  "stripe": {
+    "apiKey": ""
+  },
+  "ipstack": {
+    "apiKey": ""
+  },
+  "clientUrl": "https://stage.example.com"
+}

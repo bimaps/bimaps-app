@@ -1,0 +1,30 @@
+<template>
+  <require from="./tools.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}">
+    <fast-icon icon="Scissors"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel--no-padding" hidden>
+    <fast-button appearance="neutral" hover-fill click.trigger="clip('X')">X</fast-button>
+    <fast-button appearance="neutral" hover-fill click.trigger="clip('Y')">Y</fast-button>
+    <fast-button appearance="neutral" hover-fill click.trigger="clip('Z')">Z</fast-button>
+
+    <template if.bind="three.clippingControls.isClipping">
+      <fast-button appearance="lightweight" hover-fill icon click.trigger="clear()">
+        <fast-icon icon="X"></fast-icon>
+      </fast-button>
+    </template>
+
+    <template if.bind="three.clippingControls.isControlling">
+      <fast-button appearance="lightweight" hover-fill icon click.trigger="stopControlling()">
+        <fast-icon icon="Ban"></fast-icon>
+      </fast-button>
+      <fast-button appearance="lightweight" hover-fill icon click.trigger="invert()">
+        <fast-icon icon="Selector"></fast-icon>
+      </fast-button>
+      <!-- <fast-button appearance="invert" click.trigger="rotate()">Rotate</fast-button>
+      <fast-button appearance="invert" click.trigger="translate()">Translate</fast-button> -->
+    </template>
+  </fast-card>
+
+</template>

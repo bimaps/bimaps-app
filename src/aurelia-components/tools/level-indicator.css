@@ -1,0 +1,27 @@
+level-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+level-indicator fast-button {
+  pointer-events: initial;
+  --design-unit: 3;
+  position: relative;
+}
+level-indicator fast-button:not(:focus,:active,:hover) {
+  background: rgba(0, 0, 0, 0.1);
+}
+level-indicator fast-button.slicing:not(:focus,:active,:hover) {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+level-indicator fast-button.active::after {
+  content: ' ';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 10px;
+}

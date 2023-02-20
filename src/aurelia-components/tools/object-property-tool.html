@@ -1,0 +1,132 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./object-property-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}" disabled.bind="!siteManager.siteObject.children.length">
+    <fast-icon icon="InformationCircle"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel spatial-structure-tool-panel" hidden>
+    <template if.bind="!object">
+      <p class="text-hint">No object selected</p>
+ 
+      <fast-panel class="tool-panel-content-under-header">
+        <fast-menu>
+          <fast-menu-item repeat.for="object of objectsList" click.trigger="selectObject(object.uuid)">
+            ${object.type}
+            <fast-button click.trigger="editObject(object.uuid)" appearance="lightweight" hover-fill icon slot="end">
+              <fast-icon icon="Pencil"></fast-icon>
+            </fast-button>
+          </fast-menu-item>
+        </fast-menu>
+      </fast-panel>
+    </template>
+    <template if.bind="object">
+      <div class="button-text">
+        <fast-button appearance="lightweight" click.trigger="setObject(null)" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <p><span class="text-hint">${name(object)}</p>
+      </div>
+      <fast-accordion>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Properties</div>
+          <object-property repeat.for="key of keys(object.userData.properties)" data.bind="object.userData.properties" key.bind="key"></object-property>
+        </fast-accordion-item>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Psets</div>
+          <object-property repeat.for="key of keys(object.userData.pset)" data.bind="object.userData.pset" key.bind="key" is-pset.bind="true"></object-property>
+        </fast-accordion-item>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Geometry</div>
+          <div class="object-property-label">Position</div>
+          <object-property repeat.for="key of keys(object.position)" data.bind="object.position" key.bind="key"></object-property>
+          <div class="object-property-label">Scale</div>
+          <object-property repeat.for="key of keys(object.scale)" data.bind="object.scale" key.bind="key"></object-property>
+          <div class="object-property-label">Rotation</div>
+          <object-property repeat.for="key of keys(object.rotation)" data.bind="object.rotation" key.bind="key"></object-property>
+          <div class="object-property-label" if.bind="object.geometry.boundingBox.max">BoundingBox Max</div>
+          <object-property repeat.for="key of keys(object.geometry.boundingBox.max)" data.bind="object.geometry.boundingBox.max" key.bind="key"></object-property>
+          <div class="object-property-label" if.bind="object.geometry.boundingBox.min">BoundingBox Min</div>
+          <object-property repeat.for="key of keys(object.geometry.boundingBox.min)" data.bind="object.geometry.boundingBox.min" key.bind="key"></object-property>
+        </fast-accordion-item>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Relationships</div>
+          <div class="object-property" if.bind="object.parent">
+            <div class="object-property-label">Parent</div>
+            <div class="object-property-value object-property-clickable" click.delegate="setObject(object.parent)">${name(object.parent)}</div>
+          </div>
+          <div class="object-property" if.bind="object.children.length">
+            <div class="object-property-label">Children (${object.children.length})</div>
+            <div class="object-property-value object-property-clickable" repeat.for="child of object.children" click.delegate="setObject(child)">
+              ${name(child)}
+            </div>
+          </div>
+        </fast-accordion-item>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Misc</div>
+          <div class="object-property">
+            <div class="object-property-label">ID</div>
+            <div class="object-property-value">${object.userData.id}</div>
+          </div>
+          <div class="object-property">
+            <div class="object-property-label">UUID</div>
+            <div class="object-property-value">${object.uuid}</div>
+          </div>
+        </fast-accordion-item>
+        <fast-accordion-item slot="item">
+          <div slot="heading">Tools</div>
+
+          <p>
+            <fast-button click.trigger="hide()">Hide</fast-button>
+            <fast-button appearance="${slicingAbove ? 'accent' : 'neutral'}" click.trigger="toggleSliceAbove()">Slice above</fast-button>
+          </p>
+          <fast-card class="property-inside-card" if.bind="false">
+            <p>
+              <fast-text-field value.bind="newPropertyLabel" placeholder="Label"></fast-text-field>
+              <fast-text-field value.bind="newPropertyValue" placeholder="Value"></fast-text-field>
+              <fast-button click.trigger="addProperty(object.uuid)">Add property</fast-button>
+            </p>
+          </fast-card>
+  
+          <p>Zoom</p>
+          <p>
+            <fast-button click.trigger="zoomOnTop()">Top</fast-button>
+            <fast-button click.trigger="zoom3D()">3D</fast-button>
+          </p>
+          <p>
+            Transformation
+          </p>
+          <p>
+            <template if.bind="convertTobuilding == undefined">
+              <fast-button click.trigger="convertGidBuilding(object)">Convert to GIS Building</fast-button>
+            </template>
+            <template if.bind="convertTobuilding != undefined">
+              <div class="param-control">
+                <fast-text-field value.bind="convertBuildingName" placeholder="Building" change.trigger="concertBuildingChange()" input.trigger="concertBuildingChange()">
+                  <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openKeyListBuildings()" class="${keyValues ? '':'disabled'}"></fast-icon>
+                </fast-text-field>
+              </div>
+              <div class="param-control">
+                <fast-text-field value.bind="convertBuildingStoreyName" placeholder="Storey" change.trigger="concertBuildingStoreyChange()" input.trigger="concertBuildingStoreyChange()">
+                  <fast-icon icon="DotsCircleHorizontal" slot="start" click.trigger="openKeyListBuildingStoreys()" class="${keyValues ? '':'disabled'}"></fast-icon>
+                </fast-text-field>
+              </div>
+              <fast-button click.trigger="convertSave()" style="margin-left: 12px;">Save</fast-button>
+            </template>
+          </p>
+          <p>Navigation</p>
+          <p>
+            <fast-button click.trigger="setAsStart()">Set as Start</fast-button>
+            <fast-button click.trigger="setAsDestination()">Set as Destination</fast-button>
+          </p>
+        </fast-accordion-item>
+      </fast-accordion>
+      <div class="button-text-footer">
+        <fast-button appearance="${slicingAbove ? 'accent' : 'neutral'}" disabled if.bind="editMode" click.trigger="saveObject()">Save</fast-button>
+        <fast-button appearance="${slicingAbove ? 'accent' : 'neutral'}" disabled if.bind="!editMode" click.trigger="editObject()">Edit</fast-button>
+      </div>
+    </template>
+  </fast-card>
+  
+
+</template>

@@ -1,0 +1,176 @@
+/* .tool-button {
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  pointer-events: initial;
+} */
+.ghost {
+  margin-top: -8px;
+}
+.ghost > fast-button {
+  display: none;
+}
+.tool-panel {
+  position: absolute;
+  width: max-content;
+  max-width: 300px;
+  height: min-content;
+  padding: 8px;
+  pointer-events: initial;
+  color: var(--neutral-foreground-rest);
+}
+.tool-panel--no-padding {
+  padding: 0;
+}
+.tool-panel-with-sticky-title {
+  padding: 0;
+}
+.tool-panel-sticky-title {
+  margin: 0;
+  position: sticky;
+  z-index: 1;
+  background-color: var(--fill-color);
+  top: 0;
+  padding: 8px;
+}
+.toolbar fast-button {
+  pointer-events: initial;
+}
+.left-toolbar .tool-panel {
+  left: 50px;
+}
+.right-toolbar .tool-panel {
+  right: 50px;
+}
+.tool-panel-bottom {
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tool-panel.next-toolbar {
+  top: 0;
+}
+.left-toolbar .tool-panel.next-tool-icon,
+.right-toolbar .tool-panel.next-tool-icon {
+  transform: translateY(-50px);
+}
+.left-toolbar .tool-panel--no-padding.next-tool-icon,
+.right-toolbar .tool-panel--no-padding.next-tool-icon {
+  transform: translateY(-40px);
+}
+
+.tool-panel .tool-panel-title {
+  color: var(--neutral-foreground-rest);
+  border-radius: 10px;
+  padding: 8px;
+}
+.tool-panel-fullscreen {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: auto;
+  max-width: none;
+}
+.tool-panel-content-under-header {
+  max-height: calc(100vh - 16px - 16px - 8px - 40px - 40px - 8px - 8px);
+  overflow: auto;
+}
+.tool-panel-fullscreen .tool-panel-content-under-header {
+  max-height: calc(100vh - 8px - 40px - 40px - 8px - 8px);
+}
+fast-panel.tool-panel-content-under-header:not([hidden]) {
+  display: block;
+}
+
+.tool-sub-panel {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 8px;
+}
+.tool-sub-panel-title {
+  margin-top: -8px;
+  margin-left: -8px;
+  margin-right: -8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.tool-panel fast-accordion-item {
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tool-panel fast-accordion-item + fast-accordion-item {
+  margin-top: 8px;
+}
+.tool-panel fast-accordion-item::part(heading) {
+  background: rgba(0, 0, 0, 0.6);
+}
+.tool-panel fast-accordion-item::part(region) {
+  background: rgba(0, 0, 0, 0.3);
+}
+.tool-panel .param-section {
+  margin-top: 8px;
+  background: var(--neutral-layer-1);
+  padding: 4px;
+  border-radius: 4px;
+}
+.tool-panel .param-section + .param-section   {
+  margin-top: 16px;
+}
+.tool-panel .param-section-head {
+  font-size: 120%;
+  font-weight: bold;
+  display: grid;
+  grid-template-columns: 1fr min-content;
+  align-items: center;
+  margin: 0;
+}
+.tool-panel .param-row,
+.tool-panel .param-control {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  margin-left: 8px;
+}
+.tool-panel .param-info {
+  padding: 4px;
+  margin-left: 8px;
+}
+.tool-panel .param-info {
+  font-size: 10px;
+  opacity: 0.8;
+}
+.tool-panel .param-row + .param-row,
+.tool-panel .param-control + .param-row,
+.tool-panel .param-info + .param-row {
+  margin-top: 8px;
+}
+.tool-panel .param-row > label {
+  width: 100%;
+}
+.tool-panel .param-row > fast-button {
+  flex-shrink: 0;
+}
+.tool-panel .param-row > fast-button::part(content) {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tool-panel .param-row > fast-text-field[type=number] {
+  width: 100px;
+}
+.tool-panel .param-control > fast-text-field {
+  width: 100%;
+}
+
+.tool-panel > .button-list > fast-button {
+  margin: 4px;
+}

@@ -1,0 +1,59 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./search-tool.css"></require>
+
+  <!-- <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}" disabled.bind="!siteId">
+    <fast-icon icon="Search"></fast-icon>
+  </fast-button> -->
+
+  <fast-card ref="panel" class="search-tool-panel" disabled.bind="!siteId">
+
+    <template if.bind="mode != 'results'">
+      <form style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <fast-text-field name="search" focus="true" class="search-tool-panel-field" click.trigger="activeSearch()" placeholder="Collaborator, room, ..." value.bind="search" style="width: 100%;"></fast-text-field>
+        <fast-button click.trigger="runSearch()" appearance="lightweight" hover-fill style="width: fit-content; flex-shrink: 0;">
+          <fast-icon icon="Search"></fast-icon>
+        </fast-button>
+      </form>
+      
+      <div if.bind="mode === 'search'" class="search-tool-panel-label">
+        <span t="app.Search in"></span>
+        <fast-button click.trigger="closeSearch()" appearance="lightweight" hover-fill style="width: fit-content; flex-shrink: 0;">
+          <fast-icon icon="X"></fast-icon>
+        </fast-button>
+      </div>
+      <fast-menu ref="configSelector" if.bind="mode === 'search'">
+        <fast-menu-item checked role="menuitemcheckbox" repeat.for="config of getConfigs()">${config.name}</fast-menu-item>
+      </fast-menu>
+    </template>
+    <template if.bind="mode === 'results'">
+      <div class="button-text">
+        <fast-button appearance="lightweight" click.trigger="mode = 'search'" icon>
+          <fast-icon icon="ChevronLeft"></fast-icon>
+        </fast-button>
+        <p><span class="text-hint" t="app.Results for"></span> ${search}</p>
+      </div>
+
+      <fast-accordion>
+        <template repeat.for="config of getConfigs()">
+          <template if.bind="config.results.length">
+            <fast-accordion-item slot="item" expanded>
+              <div slot="heading">${config.name}</div>
+              <fast-menu>
+                <fast-menu-item repeat.for="result of config.results.slice(0, config.limit)" click.trigger="dispatchClickObject(result, config)">
+                  ${resultText(result, config.nameTemplate)}
+                  <fast-button if.bind="activeWalking" style="transform: scale(0.8)" appearance="lightweight" icon slot="end" click.trigger="dispatchClickObject(result, config, true, $event)">
+                    <fast-icon icon="Walking"></fast-icon>
+                  </fast-button>
+                </fast-menu-item>
+              </fast-menu>
+              <fast-button appearance="lightweight" if.bind="config.limit < config.results.length" click.trigger="config.limit = config.limit + 10" t="app.Show more"></fast-button>
+            </fast-accordion-item>
+          </template>
+        </template>
+      </fast-accordion>
+    </template>
+
+  </fast-card>
+  
+</template>

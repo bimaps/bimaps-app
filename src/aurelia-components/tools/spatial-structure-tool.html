@@ -1,0 +1,16 @@
+<template>
+  <require from="./tools.css"></require>
+  <require from="./spatial-structure-tool.css"></require>
+
+  <fast-button icon id="${buttonId}" ref="button" appearance="${opened ? 'accent' : 'neutral'}" disabled.bind="!siteManager.siteObject.children.length">
+    <fast-icon icon="Home"></fast-icon>
+  </fast-button>
+  <fast-card ref="panel" class="tool-panel tool-panel-with-sticky-title spatial-structure-tool-panel" hidden>
+    <p class="tool-panel-sticky-title"><span class="text-hint">Spatial structure</span></p>
+    <fast-menu>
+      <spatial-structure-object object.bind="siteManager.siteObject"></spatial-structure-object>
+    </fast-menu>
+  </fast-card>
+  
+
+</template>

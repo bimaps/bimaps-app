@@ -1,0 +1,45 @@
+/* normalize all ar-drawer to same z-index position */
+body ar-drawer {
+  z-index: 10;
+}
+body .drawer-overlay {
+  z-index: 9;
+}
+
+
+ux-list-item {
+  justify-content: space-between;
+}
+
+ux-list-item .ux-list-item__list-content {
+  width: 100%;
+  margin-left: 16px;
+}
+
+.requesting-indicator {
+  position: absolute;
+  top: 49px;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+}
+
+body > .notify-top-host,
+body > .notify-bottom-host {
+  position: absolute;
+  width: 100%;
+  z-index: 400;
+  pointer-events: none;
+}
+body > .notify-top-host {
+  top: 0;
+}
+
+body > .notify-bottom-host {
+  bottom: 0;
+}
+body > .notify-top-host .ar-notification .ar-notification__message,
+body > .notify-bottom-host .ar-notification .ar-notification__message {
+  pointer-events: auto;
+}

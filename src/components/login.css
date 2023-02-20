@@ -1,0 +1,39 @@
+login fast-button fast-progress-ring {
+  margin: 0;
+  width: 20px;
+  height: 20px;
+}
+/* FIX CONFLICTS WITH AURELIA-UX */
+login fast-button[type=submit] {
+  -webkit-appearance: none;
+}
+login fast-anchor.accent:not(:hover):not(:active) {
+  color: var(--foreground-on-accent-rest);
+  background-color: var(--accent-fill-rest)
+}
+login fast-anchor.accent:hover {
+  color: var(--foreground-on-accent-hover);
+  background-color: var(--accent-fill-hover)
+}
+login fast-anchor.accent:active {
+  color: var(--foreground-on-accent-active);
+  background-color: var(--accent-fill-active)
+}
+login fast-text-field-login {
+  display: inline-block;
+  outline: none;
+  user-select: none;
+}
+login fast-text-field-login fast-icon[slot="start"] {
+  display: none;
+}
+
+@keyframes onAutoFillStart {  from {/**/}  to {/**/}}
+@keyframes onAutoFillCancel {  from {/**/}  to {/**/}}
+login input:-webkit-autofill {
+    animation-name: onAutoFillStart;
+    transition: background-color 50000s ease-in-out 0s;
+}
+login input:not(:-webkit-autofill) {
+    animation-name: onAutoFillCancel;
+}
